@@ -1,0 +1,58 @@
+{% load i18n %}
+{% load bilingual_tags %}
+
+<!-- Language Switcher Component -->
+<div class="relative inline-block text-left" x-data="{ open: false }">
+    <button @click="open = !open" type="button" 
+            class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+        <i class="fas fa-globe mr-2"></i>
+        {% if LANGUAGE_CODE == 'ar' %}
+            <span class="font-arabic">العربية</span>
+        {% else %}
+            <span>English</span>
+        {% endif %}
+        <i class="fas fa-chevron-down ml-2"></i>
+    </button>
+
+    <div x-show="open" 
+         @click.away="open = false"
+         x-transition:enter="transition ease-out duration-100"
+         x-transition:enter-start="transform opacity-0 scale-95"
+         x-transition:enter-end="transform opacity-100 scale-100"
+         x-transition:leave="transition ease-in duration-75"
+         x-transition:leave-start="transform opacity-100 scale-100"
+         x-transition:leave-end="transform opacity-0 scale-95"
+         class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+         style="display: none;">
+        <div class="py-1">
+            <form action="{% url 'set_language' %}" method="post" class="block w-full">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+                
+                <button type="submit" name="language" value="en"
+                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center {{ LANGUAGE_CODE == 'en'|yesno:'bg-blue-50,'' }}">
+                    <span class="flex-1">English</span>
+                    {% if LANGUAGE_CODE == 'en' %}
+                    <i class="fas fa-check text-blue-600"></i>
+                    {% endif %}
+                </button>
+                
+                <button type="submit" name="language" value="ar"
+                        class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center font-arabic {{ LANGUAGE_CODE == 'ar'|yesno:'bg-blue-50,'' }}">
+                    <span class="flex-1">العربية</span>
+                    {% if LANGUAGE_CODE == 'ar' %}
+                    <i class="fas fa-check text-blue-600"></i>
+                    {% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Add Alpine.js if not already included -->
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+<!-- Add Google Fonts for Arabic -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">

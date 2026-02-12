@@ -1,0 +1,242 @@
+# Arabic translations for School ERP System
+# This file is distributed under the same license as the PACKAGE package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: School ERP 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-04 12:00+0300\n"
+"PO-Revision-Date: 2026-02-04 12:00+0300\n"
+"Last-Translator: System Admin\n"
+"Language-Team: Arabic\n"
+"Language: ar\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
+
+# Common strings
+msgid "English"
+msgstr "الإنجليزية"
+
+msgid "Arabic"
+msgstr "العربية"
+
+msgid "Dashboard"
+msgstr "لوحة التحكم"
+
+msgid "Students"
+msgstr "الطلاب"
+
+msgid "Teachers"
+msgstr "المعلمون"
+
+msgid "Schools"
+msgstr "المدارس"
+
+msgid "Organizations"
+msgstr "المنظمات"
+
+msgid "Reports"
+msgstr "التقارير"
+
+msgid "Settings"
+msgstr "الإعدادات"
+
+msgid "Logout"
+msgstr "تسجيل الخروج"
+
+msgid "Login"
+msgstr "تسجيل الدخول"
+
+msgid "Save"
+msgstr "حفظ"
+
+msgid "Cancel"
+msgstr "إلغاء"
+
+msgid "Edit"
+msgstr "تعديل"
+
+msgid "Delete"
+msgstr "حذف"
+
+msgid "Add"
+msgstr "إضافة"
+
+msgid "Search"
+msgstr "بحث"
+
+msgid "Filter"
+msgstr "تصفية"
+
+msgid "Name"
+msgstr "الاسم"
+
+msgid "Email"
+msgstr "البريد الإلكتروني"
+
+msgid "Phone"
+msgstr "الهاتف"
+
+msgid "Address"
+msgstr "العنوان"
+
+msgid "City"
+msgstr "المدينة"
+
+msgid "Date"
+msgstr "التاريخ"
+
+msgid "Status"
+msgstr "الحالة"
+
+msgid "Active"
+msgstr "نشط"
+
+msgid "Inactive"
+msgstr "غير نشط"
+
+msgid "Total"
+msgstr "المجموع"
+
+msgid "Subtotal"
+msgstr "المجموع الفرعي"
+
+msgid "VAT"
+msgstr "ضريبة القيمة المضافة"
+
+msgid "Amount"
+msgstr "المبلغ"
+
+msgid "Invoice"
+msgstr "فاتورة"
+
+msgid "Payment"
+msgstr "دفع"
+
+msgid "Academic Year"
+msgstr "السنة الدراسية"
+
+msgid "Grade"
+msgstr "الصف"
+
+msgid "Class"
+msgstr "الفصل"
+
+msgid "Subject"
+msgstr "المادة"
+
+msgid "Attendance"
+msgstr "الحضور"
+
+msgid "Marks"
+msgstr "الدرجات"
+
+msgid "Homework"
+msgstr "الواجبات المنزلية"
+
+msgid "Timetable"
+msgstr "الجدول الدراسي"
+
+msgid "Transport"
+msgstr "النقل"
+
+msgid "Hostel"
+msgstr "السكن"
+
+msgid "Billing"
+msgstr "الفواتير"
+
+msgid "Enrollment"
+msgstr "التسجيل"
+
+msgid "Evaluation"
+msgstr "التقييم"
+
+msgid "Course"
+msgstr "الدورة"
+
+msgid "Batch"
+msgstr "الدفعة"
+
+msgid "Details"
+msgstr "التفاصيل"
+
+msgid "View"
+msgstr "عرض"
+
+msgid "Update"
+msgstr "تحديث"
+
+msgid "Create"
+msgstr "إنشاء"
+
+msgid "Submit"
+msgstr "إرسال"
+
+msgid "Back"
+msgstr "رجوع"
+
+msgid "Next"
+msgstr "التالي"
+
+msgid "Previous"
+msgstr "السابق"
+
+msgid "Loading..."
+msgstr "جاري التحميل..."
+
+msgid "No data available"
+msgstr "لا توجد بيانات متاحة"
+
+msgid "Success"
+msgstr "نجح"
+
+msgid "Error"
+msgstr "خطأ"
+
+msgid "Warning"
+msgstr "تحذير"
+
+msgid "Information"
+msgstr "معلومات"
+
+msgid "Confirm"
+msgstr "تأكيد"
+
+msgid "Are you sure?"
+msgstr "هل أنت متأكد؟"
+
+msgid "Yes"
+msgstr "نعم"
+
+msgid "No"
+msgstr "لا"
+
+msgid "Welcome"
+msgstr "مرحباً"
+
+msgid "Profile"
+msgstr "الملف الشخصي"
+
+msgid "Change Password"
+msgstr "تغيير كلمة المرور"
+
+msgid "Notifications"
+msgstr "الإشعارات"
+
+msgid "Help"
+msgstr "مساعدة"
+
+msgid "About"
+msgstr "حول"
+
+msgid "Contact"
+msgstr "اتصل بنا"
+
+msgid "Privacy Policy"
+msgstr "سياسة الخصوصية"
+
+msgid "Terms of Service"
+msgstr "شروط الخدمة"

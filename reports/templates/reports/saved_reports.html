@@ -1,0 +1,101 @@
+{% extends 'layout.html' %}
+
+{% block title %}Saved Reports{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Saved Reports</h1>
+            <p class="text-gray-600 mt-1">Access previously generated reports</p>
+        </div>
+        <a href="{% url 'reports:dashboard' %}" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">← Back</a>
+    </div>
+
+    <!-- Filter by Type -->
+    <div class="bg-white rounded-xl shadow-md p-4 mb-6">
+        <form method="get" class="flex items-center space-x-4">
+            <label class="text-sm font-medium text-gray-700">Filter by Type:</label>
+            <select name="type" onchange="this.form.submit()" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                <option value="">All Types</option>
+                {% for value, label in report_types %}
+                <option value="{{ value }}" {% if selected_type == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    <!-- Reports List -->
+    <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Report Title</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date Range</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Generated</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">By</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Records</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for report in reports %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">
+                            <div class="text-sm font-medium text-gray-900">{{ report.title }}</div>
+                            {% if report.notes %}
+                            <div class="text-xs text-gray-500 mt-1">{{ report.notes|truncatewords:10 }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-purple-100 text-purple-800">
+                                {{ report.get_report_type_display }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {% if report.date_from and report.date_to %}
+                                {{ report.date_from|date:"M d" }} - {{ report.date_to|date:"M d, Y" }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ report.generated_at|date:"M d, Y H:i" }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {{ report.generated_by.get_full_name|default:report.generated_by.username }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-800 rounded">
+                                {{ report.total_records }} record{{ report.total_records|pluralize }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-3">
+                            <a href="{% url 'reports:view_saved_report' report.id %}" class="text-purple-600 hover:text-purple-900">View</a>
+                            {% if report.pdf_path %}
+                            <a href="{{ report.pdf_path }}" class="text-red-600 hover:text-red-900">PDF</a>
+                            {% endif %}
+                            {% if report.excel_path %}
+                            <a href="{{ report.excel_path }}" class="text-green-600 hover:text-green-900">Excel</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-8 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                            <p class="mt-2 text-gray-500">No saved reports yet</p>
+                            <p class="text-sm text-gray-400 mt-1">Generate reports and save them for future reference</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

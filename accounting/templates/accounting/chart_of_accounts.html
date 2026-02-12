@@ -1,0 +1,95 @@
+{% extends "layout.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Chart of Accounts" %}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">{% trans "Chart of Accounts" %}</h1>
+        <div class="flex gap-2">
+            {% if can_setup_accounts and total_accounts == 0 %}
+                <a href="{% url 'accounting:setup_chart_of_accounts' %}" class="bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600">
+                    <i class="fas fa-cog mr-2"></i>{% trans "Setup Default Accounts" %}
+                </a>
+            {% endif %}
+            {% if can_create_account %}
+                <a href="{% url 'accounting:account_create' %}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    <i class="fas fa-plus mr-2"></i>{% trans "New Account" %}
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="mb-4">
+            <p class="text-gray-600">{% trans "Total Accounts" %}: <span class="font-bold">{{ total_accounts }}</span></p>
+        </div>
+
+        {% if accounts_by_type %}
+            {% for type, accounts in accounts_by_type.items %}
+            <div class="mb-6">
+                <h2 class="text-xl font-bold mb-3 text-blue-700 border-b-2 border-blue-200 pb-2">
+                    <i class="fas fa-folder mr-2"></i>{{ type }}
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Code" %}</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Name" %}</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">{% trans "Parent" %}</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">{% trans "Current Balance" %}</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">{% trans "Status" %}</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">{% trans "System" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for account in accounts %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ account.code }}</td>
+                                <td class="px-4 py-3 text-sm text-gray-900">
+                                    {{ account.name }}
+                                    {% if account.name_arabic %}
+                                        <span class="text-gray-500 text-xs block" dir="rtl">{{ account.name_arabic }}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">
+                                    {% if account.parent %}{{ account.parent.code }} - {{ account.parent.name }}{% else %}-{% endif %}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-right font-semibold {% if account.current_balance > 0 %}text-green-600{% elif account.current_balance < 0 %}text-red-600{% else %}text-gray-900{% endif %}">
+                                    {{ account.current_balance|floatformat:2 }} {% trans "SAR" %}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-center">
+                                    {% if account.is_active %}
+                                        <span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">{% trans "Active" %}</span>
+                                    {% else %}
+                                        <span class="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 rounded-full">{% trans "Inactive" %}</span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-4 py-3 text-sm text-center">
+                                    {% if account.is_system %}
+                                        <i class="fas fa-lock text-gray-400" title="{% trans 'System Account' %}"></i>
+                                    {% else %}
+                                        -
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="text-center py-12">
+                <i class="fas fa-inbox text-gray-300 text-6xl mb-4"></i>
+                <p class="text-gray-500 text-lg mb-4">{% trans "No accounts found" %}</p>
+                <a href="{% url 'accounting:setup_chart_of_accounts' %}" class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600">
+                    {% trans "Setup Default Chart of Accounts" %}
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

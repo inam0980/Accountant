@@ -1,0 +1,171 @@
+{% extends "layout.html" %}
+{% load i18n %}
+
+{% block title %}{{ action }} {% trans "Journal Entry" %}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6 max-w-6xl">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">{{ action }} {% trans "Journal Entry" %}</h1>
+        <a href="{% url 'accounting:journal_entry_list' %}" class="text-gray-600 hover:text-gray-800">
+            <i class="fas fa-arrow-left mr-2"></i>{% trans "Back to List" %}
+        </a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+            
+            {% if form.errors or formset.errors %}
+                <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-exclamation-circle text-red-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-red-700">
+                                {% trans "Please correct the errors below." %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        {% trans "Fiscal Year" %} <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.fiscal_year }}
+                    {% if form.fiscal_year.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.fiscal_year.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        {% trans "Date" %} <span class="text-red-500">*</span>
+                    </label>
+                    {{ form.date }}
+                    {% if form.date.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ form.date.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    {% trans "Reference" %}
+                </label>
+                {{ form.reference }}
+                {% if form.reference.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.reference.errors.0 }}</p>
+                {% endif %}
+                <p class="mt-1 text-xs text-gray-500">{% trans "External reference like Invoice #, Receipt #" %}</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    {% trans "Description" %} <span class="text-red-500">*</span>
+                </label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                    <p class="mt-1 text-sm text-red-600">{{ form.description.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="border-t pt-6">
+                <h3 class="text-lg font-semibold mb-4">{% trans "Journal Entry Lines" %}</h3>
+                <p class="text-sm text-gray-600 mb-4">
+                    <i class="fas fa-info-circle text-blue-500"></i>
+                    {% trans "Enter at least 2 lines. Total debits must equal total credits." %}
+                </p>
+
+                {{ formset.management_form }}
+                
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 mb-4">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase" style="width: 30%;">{% trans "Account" %}</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase" style="width: 25%;">{% trans "Description" %}</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase" style="width: 15%;">{% trans "Debit" %}</th>
+                                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase" style="width: 15%;">{% trans "Credit" %}</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase" style="width: 10%;">{% trans "Delete" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for line_form in formset %}
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-4 py-3">
+                                        {{ line_form.account }}
+                                        {% if line_form.account.errors %}
+                                            <p class="text-xs text-red-600">{{ line_form.account.errors.0 }}</p>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        {{ line_form.description }}
+                                        {% if line_form.description.errors %}
+                                            <p class="text-xs text-red-600">{{ line_form.description.errors.0 }}</p>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        {{ line_form.debit_amount }}
+                                        {% if line_form.debit_amount.errors %}
+                                            <p class="text-xs text-red-600">{{ line_form.debit_amount.errors.0 }}</p>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        {{ line_form.credit_amount }}
+                                        {% if line_form.credit_amount.errors %}
+                                            <p class="text-xs text-red-600">{{ line_form.credit_amount.errors.0 }}</p>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-4 py-3 text-center">
+                                        {{ line_form.DELETE }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-4 pt-4 border-t">
+                <a href="{% url 'accounting:journal_entry_list' %}" class="bg-gray-200 text-gray-700 px-6 py-2 rounded hover:bg-gray-300">
+                    {% trans "Cancel" %}
+                </a>
+                <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">
+                    <i class="fas fa-save mr-2"></i>{% trans "Save Entry" %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+// Auto-calculate totals
+document.addEventListener('DOMContentLoaded', function() {
+    const debitInputs = document.querySelectorAll('input[name$="-debit_amount"]');
+    const creditInputs = document.querySelectorAll('input[name$="-credit_amount"]');
+    
+    function calculateTotals() {
+        let totalDebit = 0;
+        let totalCredit = 0;
+        
+        debitInputs.forEach(input => {
+            totalDebit += parseFloat(input.value) || 0;
+        });
+        
+        creditInputs.forEach(input => {
+            totalCredit += parseFloat(input.value) || 0;
+        });
+        
+        console.log('Total Debit:', totalDebit.toFixed(2), 'Total Credit:', totalCredit.toFixed(2));
+    }
+    
+    debitInputs.forEach(input => input.addEventListener('input', calculateTotals));
+    creditInputs.forEach(input => input.addEventListener('input', calculateTotals));
+});
+</script>
+{% endblock %}

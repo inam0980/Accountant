@@ -1,0 +1,62 @@
+# School ERP System - Requirements
+# Python 3.8+
+
+# Core Framework
+Django>=5.2.8,<6.0
+
+# Tailwind CSS Integration
+django-tailwind>=3.8.0
+
+# Database (Production)
+# psycopg2-binary>=2.9.9  # Uncomment for PostgreSQL
+
+# Date/Time Support (Phase 2 - INSTALLED)
+hijri-converter>=2.3.0  # For Hijri calendar support
+
+# PDF Generation (Phase 4 - INSTALLED)
+reportlab>=4.0.0  # For invoice and report PDFs
+# WeasyPrint>=60.0  # Alternative PDF generator
+# qrcode>=7.4.0  # QR codes for invoices
+# arabic-reshaper>=3.0  # Arabic text in PDFs
+# python-bidi>=0.4  # Bidirectional text
+
+# Excel Export (Phase 4 - INSTALLED)
+openpyxl>=3.1.0  # For Excel report generation
+# xlsxwriter>=3.1.0  # Alternative Excel library
+
+# Image Processing (Phase 2 - INSTALLED)
+Pillow>=10.0.0  # For student photos and documents
+
+# Forms & Widgets
+# django-crispy-forms>=2.1  # Better form rendering (OPTIONAL)
+# crispy-tailwind>=1.0.0  # Tailwind support for crispy forms (OPTIONAL)
+
+# Development Tools
+# django-debug-toolbar>=4.2.0  # Debug toolbar (DEVELOPMENT ONLY)
+
+# Security & Auth
+# django-allauth>=0.57.0  # Advanced authentication (OPTIONAL)
+
+# API (Future)
+# djangorestframework>=3.14.0  # For REST API (FUTURE)
+
+# Celery (Background Tasks - Future)
+# celery>=5.3.0  # For async tasks (FUTURE)
+# redis>=5.0.0  # Celery broker (FUTURE)
+
+# Email
+# django-ses>=3.5.0  # AWS SES for emails (OPTIONAL)
+
+# Monitoring (Production)
+# sentry-sdk>=1.40.0  # Error tracking (PRODUCTION)
+
+# Environment Variables
+# python-decouple>=3.8  # Environment variable management (RECOMMENDED)
+
+# WSGI Server (Production)
+# gunicorn>=21.2.0  # Production WSGI server
+# whitenoise>=6.6.0  # Static file serving
+
+# Current Minimal Requirements for Phase 1
+# pip install Django>=5.2.8
+# pip install django-tailwind>=3.8.0

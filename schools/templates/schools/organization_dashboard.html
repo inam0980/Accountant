@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Organization Dashboard - Multi-School ERP{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Page Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">
+            <i class="fas fa-building mr-2 text-blue-600"></i>
+            Organization Dashboard
+        </h1>
+        <p class="text-gray-600">Manage all organizations and schools in the system</p>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Total Organizations -->
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-blue-100 text-sm font-medium uppercase">Organizations</p>
+                    <p class="text-3xl font-bold mt-2">{{ total_organizations }}</p>
+                </div>
+                <div class="bg-blue-400 bg-opacity-30 rounded-full p-3">
+                    <i class="fas fa-building text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Schools -->
+        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-green-100 text-sm font-medium uppercase">Schools/Branches</p>
+                    <p class="text-3xl font-bold mt-2">{{ total_schools }}</p>
+                </div>
+                <div class="bg-green-400 bg-opacity-30 rounded-full p-3">
+                    <i class="fas fa-school text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Students -->
+        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-purple-100 text-sm font-medium uppercase">Total Students</p>
+                    <p class="text-3xl font-bold mt-2">{{ total_students|default:"0" }}</p>
+                </div>
+                <div class="bg-purple-400 bg-opacity-30 rounded-full p-3">
+                    <i class="fas fa-user-graduate text-2xl"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Teachers -->
+        <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-orange-100 text-sm font-medium uppercase">Total Teachers</p>
+                    <p class="text-3xl font-bold mt-2">{{ total_teachers|default:"0" }}</p>
+                </div>
+                <div class="bg-orange-400 bg-opacity-30 rounded-full p-3">
+                    <i class="fas fa-chalkboard-teacher text-2xl"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Organizations List -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-semibold text-gray-800">
+                <i class="fas fa-list mr-2 text-blue-600"></i>
+                All Organizations
+            </h2>
+            {% if user.is_superuser %}
+            <a href="{% url 'schools:organization_create' %}" 
+               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg inline-flex items-center transition">
+                <i class="fas fa-plus mr-2"></i>
+                Add Organization
+            </a>
+            {% endif %}
+        </div>
+
+        {% if organizations %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for org in organizations %}
+            <div class="border border-gray-200 rounded-lg p-6 hover:shadow-lg transition">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-1">
+                            {{ org.name }}
+                        </h3>
+                        {% if org.name_arabic %}
+                        <p class="text-gray-600 text-sm" dir="rtl">{{ org.name_arabic }}</p>
+                        {% endif %}
+                    </div>
+                    {% if org.logo %}
+                    <img src="{{ org.logo.url }}" alt="{{ org.name }}" class="w-12 h-12 object-contain ml-4">
+                    {% endif %}
+                </div>
+
+                <div class="space-y-2 mb-4 text-sm text-gray-600">
+                    <p><i class="fas fa-code mr-2 text-blue-600"></i>{{ org.organization_code }}</p>
+                    <p><i class="fas fa-envelope mr-2 text-blue-600"></i>{{ org.email }}</p>
+                    <p><i class="fas fa-phone mr-2 text-blue-600"></i>{{ org.phone }}</p>
+                    <p><i class="fas fa-map-marker-alt mr-2 text-blue-600"></i>{{ org.city }}, {{ org.country }}</p>
+                </div>
+
+                <div class="flex items-center justify-between pt-4 border-t border-gray-200">
+                    <span class="text-sm text-gray-600">
+                        <i class="fas fa-school mr-1 text-green-600"></i>
+                        {{ org.school_count }} School{{ org.school_count|pluralize }}
+                    </span>
+                    <a href="{% url 'schools:organization_detail' org.pk %}" 
+                       class="text-blue-600 hover:text-blue-800 font-medium text-sm">
+                        View Details <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+            <i class="fas fa-building text-6xl text-gray-300 mb-4"></i>
+            <p class="text-gray-600 text-lg">No organizations found</p>
+            {% if user.is_superuser %}
+            <a href="{% url 'schools:organization_create' %}" 
+               class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg">
+                Create First Organization
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+        <a href="{% url 'schools:school_list' %}" 
+           class="bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg p-4 text-center transition">
+            <i class="fas fa-school text-3xl text-green-600 mb-2"></i>
+            <p class="font-semibold text-gray-800">View All Schools</p>
+        </a>
+        
+        {% if user.is_superuser %}
+        <a href="{% url 'schools:organization_create' %}" 
+           class="bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg p-4 text-center transition">
+            <i class="fas fa-plus-circle text-3xl text-blue-600 mb-2"></i>
+            <p class="font-semibold text-gray-800">Add Organization</p>
+        </a>
+        
+        <a href="{% url 'schools:school_create' %}" 
+           class="bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg p-4 text-center transition">
+            <i class="fas fa-school text-3xl text-purple-600 mb-2"></i>
+            <p class="font-semibold text-gray-800">Add School</p>
+        </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

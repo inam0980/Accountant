@@ -1,0 +1,143 @@
+{% extends 'layout.html' %}
+
+{% block title %}Outstanding Fees Report{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Outstanding Fees Report</h1>
+            <p class="text-gray-600 mt-1">Students with pending fee payments</p>
+        </div>
+        <a href="{% url 'reports:dashboard' %}" class="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600">← Back</a>
+    </div>
+
+    <!-- Summary Card -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg p-8 text-white">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-red-100 text-sm uppercase">Total Outstanding</p>
+                    <h3 class="text-5xl font-bold mt-2">₹{{ total_outstanding|floatformat:2 }}</h3>
+                    <p class="text-red-100 mt-2">From {{ total_students }} students</p>
+                </div>
+                <svg class="w-24 h-24 opacity-30" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <h3 class="text-lg font-semibold text-gray-900 mb-4">Filter by Class</h3>
+            <form method="get">
+                <select name="class_id" onchange="this.form.submit()" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+                    <option value="">All Classes</option>
+                    {% for class in classes %}
+                    <option value="{{ class.id }}" {% if selected_class == class.id|stringformat:"s" %}selected{% endif %}>{{ class.name }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <!-- Outstanding List -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold text-gray-900">Outstanding Details</h2>
+            <div class="flex space-x-2">
+                <button onclick="window.print()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700">Print</button>
+                <button onclick="exportReport()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">Export</button>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">#</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Student Details</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Class</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Outstanding Amount</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pending Invoices</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Days Overdue</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for data in outstanding_data %}
+                    <tr class="hover:bg-gray-50 {% if data.days_overdue > 60 %}bg-red-50{% elif data.days_overdue > 30 %}bg-yellow-50{% endif %}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ forloop.counter }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm font-medium text-gray-900">{{ data.student.first_name }} {{ data.student.last_name }}</div>
+                            <div class="text-sm text-gray-500">{{ data.student.admission_number }}</div>
+                            {% if data.student.parent_set.first %}
+                            <div class="text-xs text-gray-500">{{ data.student.parent_set.first.phone }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                            {{ data.student.current_class.name }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-lg font-bold text-red-600">₹{{ data.total_outstanding|floatformat:2 }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                {{ data.invoice_count }} invoice{{ data.invoice_count|pluralize }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                {% if data.days_overdue > 60 %}bg-red-100 text-red-800
+                                {% elif data.days_overdue > 30 %}bg-orange-100 text-orange-800
+                                {% else %}bg-yellow-100 text-yellow-800{% endif %}">
+                                {{ data.days_overdue }} days
+                            </span>
+                            <div class="text-xs text-gray-500 mt-1">Since {{ data.oldest_invoice_date|date:"M d, Y" }}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            <a href="{% url 'students:student_detail' data.student.id %}" class="text-purple-600 hover:text-purple-900">View</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-8 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <p class="mt-2 text-gray-500">No outstanding fees! All payments are up to date.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Urgency Legend -->
+    {% if outstanding_data %}
+    <div class="mt-6 bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-3">Priority Legend</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="flex items-center">
+                <div class="w-4 h-4 bg-red-200 rounded mr-2"></div>
+                <span class="text-sm text-gray-700"><strong>High Priority:</strong> Over 60 days overdue</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-4 h-4 bg-yellow-200 rounded mr-2"></div>
+                <span class="text-sm text-gray-700"><strong>Medium Priority:</strong> 30-60 days overdue</span>
+            </div>
+            <div class="flex items-center">
+                <div class="w-4 h-4 bg-white border border-gray-300 rounded mr-2"></div>
+                <span class="text-sm text-gray-700"><strong>Low Priority:</strong> Under 30 days overdue</span>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function exportReport() {
+    window.location.href = "{% url 'reports:export_report' 'outstanding' %}?format=excel";
+}
+</script>
+{% endblock %}

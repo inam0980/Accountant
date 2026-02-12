@@ -1,0 +1,176 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}Settings & Configuration - Alkawthar Schools{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">
+            <i class="fas fa-cog text-purple-600 mr-3"></i>Settings & Configuration
+        </h1>
+        <p class="text-gray-600">Manage system settings, academic structure, and master data</p>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-8">
+        <!-- Active School Year -->
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between mb-2">
+                <i class="fas fa-calendar-alt text-3xl opacity-80"></i>
+                <span class="text-sm font-medium bg-white bg-opacity-20 px-3 py-1 rounded-full">Active</span>
+            </div>
+            <div class="mt-4">
+                <p class="text-sm opacity-90 mb-1">Current School Year</p>
+                <p class="text-2xl font-bold">
+                    {% if active_school_year %}{{ active_school_year.name }}{% else %}Not Set{% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Programs Count -->
+        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between mb-2">
+                <i class="fas fa-graduation-cap text-3xl opacity-80"></i>
+                <span class="text-sm font-medium bg-white bg-opacity-20 px-3 py-1 rounded-full">Programs</span>
+            </div>
+            <div class="mt-4">
+                <p class="text-sm opacity-90 mb-1">Active Programs</p>
+                <p class="text-2xl font-bold">{{ programs_count }}</p>
+            </div>
+        </div>
+
+        <!-- Grades Count -->
+        <div class="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between mb-2">
+                <i class="fas fa-layer-group text-3xl opacity-80"></i>
+                <span class="text-sm font-medium bg-white bg-opacity-20 px-3 py-1 rounded-full">Grades</span>
+            </div>
+            <div class="mt-4">
+                <p class="text-sm opacity-90 mb-1">Total Grades</p>
+                <p class="text-2xl font-bold">{{ grades_count }}</p>
+            </div>
+        </div>
+
+        <!-- VAT Config -->
+        <div class="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between mb-2">
+                <i class="fas fa-percent text-3xl opacity-80"></i>
+                <span class="text-sm font-medium bg-white bg-opacity-20 px-3 py-1 rounded-full">VAT</span>
+            </div>
+            <div class="mt-4">
+                <p class="text-sm opacity-90 mb-1">Current VAT Rate</p>
+                <p class="text-2xl font-bold">
+                    {% if active_vat %}{{ active_vat.vat_percentage }}%{% else %}Not Set{% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuration Modules -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- School Years -->
+        <a href="{% url 'settings_app:school_year_list' %}" class="block bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                        <i class="fas fa-calendar-alt text-2xl text-blue-600"></i>
+                    </div>
+                    <span class="text-sm font-semibold text-gray-500">{{ school_years_count }} Years</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">School Years</h3>
+                <p class="text-gray-600 text-sm">Configure academic years and terms</p>
+                <div class="mt-4 text-blue-600 font-medium flex items-center">
+                    Manage <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- Programs -->
+        <a href="{% url 'settings_app:program_list' %}" class="block bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                        <i class="fas fa-graduation-cap text-2xl text-green-600"></i>
+                    </div>
+                    <span class="text-sm font-semibold text-gray-500">{{ programs_count }} Programs</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Educational Programs</h3>
+                <p class="text-gray-600 text-sm">Elementary, Middle, High School programs</p>
+                <div class="mt-4 text-green-600 font-medium flex items-center">
+                    Manage <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- Grades/Classes -->
+        <a href="{% url 'settings_app:grade_list' %}" class="block bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 bg-purple-100 rounded-lg flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                        <i class="fas fa-layer-group text-2xl text-purple-600"></i>
+                    </div>
+                    <span class="text-sm font-semibold text-gray-500">{{ grades_count }} Grades</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Grades & Classes</h3>
+                <p class="text-gray-600 text-sm">Configure grade levels and classes</p>
+                <div class="mt-4 text-purple-600 font-medium flex items-center">
+                    Manage <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- Sections -->
+        <a href="{% url 'settings_app:section_list' %}" class="block bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 bg-indigo-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
+                        <i class="fas fa-users-class text-2xl text-indigo-600"></i>
+                    </div>
+                    <span class="text-sm font-semibold text-gray-500">{{ sections_count }} Sections</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Sections</h3>
+                <p class="text-gray-600 text-sm">Manage class sections and divisions</p>
+                <div class="mt-4 text-indigo-600 font-medium flex items-center">
+                    Manage <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- Fee Structures -->
+        <a href="{% url 'settings_app:fee_structure_list' %}" class="block bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 bg-pink-100 rounded-lg flex items-center justify-center group-hover:bg-pink-200 transition-colors">
+                        <i class="fas fa-money-bill-wave text-2xl text-pink-600"></i>
+                    </div>
+                    <span class="text-sm font-semibold text-gray-500">{{ fee_structures_count }} Structures</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">Fee Structures</h3>
+                <p class="text-gray-600 text-sm">Configure fee types and amounts</p>
+                <div class="mt-4 text-pink-600 font-medium flex items-center">
+                    Manage <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </div>
+        </a>
+
+        <!-- VAT Configuration -->
+        <a href="{% url 'settings_app:vat_config_list' %}" class="block bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden group">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="w-14 h-14 bg-orange-100 rounded-lg flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+                        <i class="fas fa-percent text-2xl text-orange-600"></i>
+                    </div>
+                    <span class="text-sm font-semibold text-gray-500">Tax Settings</span>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800 mb-2">VAT Configuration</h3>
+                <p class="text-gray-600 text-sm">Manage VAT rates and tax settings</p>
+                <div class="mt-4 text-orange-600 font-medium flex items-center">
+                    Manage <i class="fas fa-arrow-right ml-2"></i>
+                </div>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}

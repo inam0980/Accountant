@@ -1,0 +1,133 @@
+{% extends "layout.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Balance Sheet" %}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6 max-w-6xl">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-3xl font-bold">{% trans "Balance Sheet" %}</h1>
+        <a href="{% url 'accounting:dashboard' %}" class="text-gray-600 hover:text-gray-800">
+            <i class="fas fa-arrow-left mr-2"></i>{% trans "Back to Dashboard" %}
+        </a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <form method="get" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">{% trans "Fiscal Year" %} <span class="text-red-500">*</span></label>
+                {{ form.fiscal_year }}
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">{% trans "As of Date" %}</label>
+                {{ form.as_of_date }}
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 w-full">
+                    <i class="fas fa-chart-bar mr-2"></i>{% trans "Generate Report" %}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    {% if report_data %}
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="mb-6 text-center">
+            <h2 class="text-2xl font-bold">{% trans "Balance Sheet" %}</h2>
+            <p class="text-gray-600">{{ report_data.fiscal_year.name }}</p>
+            <p class="text-gray-600">{% trans "As of" %}: {{ report_data.as_of_date|date:"d M Y" }}</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Assets -->
+            <div>
+                <h3 class="text-xl font-bold mb-4 text-blue-700 border-b-2 border-blue-200 pb-2">
+                    {% trans "Assets" %}
+                </h3>
+                <table class="w-full">
+                    <tbody>
+                        {% for asset in report_data.assets %}
+                        <tr class="border-b">
+                            <td class="py-2 text-sm">
+                                <span class="font-medium">{{ asset.code }}</span> - {{ asset.name }}
+                            </td>
+                            <td class="py-2 text-sm text-right font-semibold">{{ asset.balance|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="bg-blue-50 font-bold">
+                            <td class="py-3 text-sm">{% trans "Total Assets" %}</td>
+                            <td class="py-3 text-sm text-right text-blue-700">{{ report_data.total_assets|floatformat:2 }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Liabilities & Equity -->
+            <div>
+                <h3 class="text-xl font-bold mb-4 text-red-700 border-b-2 border-red-200 pb-2">
+                    {% trans "Liabilities" %}
+                </h3>
+                <table class="w-full mb-6">
+                    <tbody>
+                        {% for liability in report_data.liabilities %}
+                        <tr class="border-b">
+                            <td class="py-2 text-sm">
+                                <span class="font-medium">{{ liability.code }}</span> - {{ liability.name }}
+                            </td>
+                            <td class="py-2 text-sm text-right font-semibold">{{ liability.balance|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="bg-red-50 font-bold">
+                            <td class="py-3 text-sm">{% trans "Total Liabilities" %}</td>
+                            <td class="py-3 text-sm text-right text-red-700">{{ report_data.total_liabilities|floatformat:2 }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 class="text-xl font-bold mb-4 text-green-700 border-b-2 border-green-200 pb-2">
+                    {% trans "Equity" %}
+                </h3>
+                <table class="w-full">
+                    <tbody>
+                        {% for equity in report_data.equity %}
+                        <tr class="border-b">
+                            <td class="py-2 text-sm">
+                                <span class="font-medium">{{ equity.code }}</span> - {{ equity.name }}
+                            </td>
+                            <td class="py-2 text-sm text-right font-semibold">{{ equity.balance|floatformat:2 }}</td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="bg-green-50 font-bold">
+                            <td class="py-3 text-sm">{% trans "Total Equity" %}</td>
+                            <td class="py-3 text-sm text-right text-green-700">{{ report_data.total_equity|floatformat:2 }}</td>
+                        </tr>
+                        <tr class="bg-gray-100 font-bold text-lg">
+                            <td class="py-3 text-sm">{% trans "Total Liabilities & Equity" %}</td>
+                            <td class="py-3 text-sm text-right">{{ report_data.total_liabilities|add:report_data.total_equity|floatformat:2 }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="mt-6 p-4 {% if report_data.is_balanced %}bg-green-50 border-green-200{% else %}bg-red-50 border-red-200{% endif %} border-l-4 rounded">
+            <p class="text-center font-semibold">
+                {% if report_data.is_balanced %}
+                    <i class="fas fa-check-circle text-green-600 mr-2"></i>
+                    <span class="text-green-700">{% trans "Assets = Liabilities + Equity" %}</span>
+                {% else %}
+                    <i class="fas fa-exclamation-triangle text-red-600 mr-2"></i>
+                    <span class="text-red-700">{% trans "Balance Sheet does not balance" %}</span>
+                {% endif %}
+            </p>
+        </div>
+
+        <div class="mt-6 flex justify-end space-x-4">
+            <button onclick="window.print()" class="bg-gray-500 text-white px-6 py-2 rounded hover:bg-gray-600">
+                <i class="fas fa-print mr-2"></i>{% trans "Print" %}
+            </button>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

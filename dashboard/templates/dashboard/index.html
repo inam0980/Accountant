@@ -1,0 +1,264 @@
+{% extends 'layout.html' %}
+
+{% block title %}Accountant Dashboard - Financial Management{% endblock %}
+
+{% block breadcrumb_items %}
+    <span class="mx-2 text-gray-400">/</span>
+    <span class="text-gray-800 font-medium">Accountant Dashboard</span>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="mb-8">
+    <div class="flex items-center justify-between">
+        <div>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2 flex items-center gap-3">
+                <i class="fas fa-tachometer-alt text-blue-600"></i> Accountant Dashboard
+            </h1>
+            <p class="text-gray-600 text-lg">Financial Management System - Select a module below to get started</p>
+        </div>
+        <div class="text-right">
+            <p class="text-sm text-gray-500">Logged in as:</p>
+            <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold bg-blue-100 text-blue-800 border border-blue-300">
+                <i class="fas fa-user-circle mr-2"></i>
+                {{ user_role }}
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Statistics Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+    <!-- Total Students -->
+    <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm opacity-80 font-medium">Total Students</p>
+                <h3 class="text-4xl font-bold mt-2">{{ total_students }}</h3>
+                <p class="text-xs opacity-70 mt-1">Active enrollments</p>
+            </div>
+            <div class="bg-white bg-opacity-20 rounded-full p-4">
+                <i class="fas fa-users text-4xl"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Revenue This Month -->
+    <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm opacity-80 font-medium">Revenue (This Month)</p>
+                <h3 class="text-4xl font-bold mt-2">{{ monthly_revenue }} <span class="text-2xl">SAR</span></h3>
+                <p class="text-xs opacity-70 mt-1">Collected payments</p>
+            </div>
+            <div class="bg-white bg-opacity-20 rounded-full p-4">
+                <i class="fas fa-dollar-sign text-4xl"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Pending Payments -->
+    <div class="bg-gradient-to-br from-red-500 to-red-600 text-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm opacity-80 font-medium">Pending Payments</p>
+                <h3 class="text-4xl font-bold mt-2">{{ pending_payments }}</h3>
+                <p class="text-xs opacity-70 mt-1">Unpaid invoices</p>
+            </div>
+            <div class="bg-white bg-opacity-20 rounded-full p-4">
+                <i class="fas fa-exclamation-triangle text-4xl"></i>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Overdue Invoices -->
+    <div class="bg-gradient-to-br from-orange-500 to-orange-600 text-white p-6 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-sm opacity-80 font-medium">Overdue Invoices</p>
+                <h3 class="text-4xl font-bold mt-2">{{ overdue_count }}</h3>
+                <p class="text-xs opacity-70 mt-1">Require attention</p>
+            </div>
+            <div class="bg-white bg-opacity-20 rounded-full p-4">
+                <i class="fas fa-clock text-4xl"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if staff_stats %}
+<!-- Admin Statistics Section -->
+<div class="bg-white rounded-xl shadow-lg p-6 mb-8 border-l-4 border-indigo-500">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <i class="fas fa-chart-bar text-indigo-600"></i> Staff & User Statistics
+            </h2>
+            <p class="text-gray-600 text-sm mt-1">Complete system overview (Admin only)</p>
+        </div>
+        <a href="{% url 'dashboard:statistics' %}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition flex items-center gap-2">
+            <i class="fas fa-chart-line"></i> View Detailed Stats
+        </a>
+    </div>
+    
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-lg p-4 text-center">
+            <div class="text-3xl font-bold text-indigo-700">{{ staff_stats.total_users }}</div>
+            <div class="text-sm text-indigo-600 mt-1">Total Users</div>
+        </div>
+        <div class="bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg p-4 text-center">
+            <div class="text-3xl font-bold text-blue-700">{{ staff_stats.admin }}</div>
+            <div class="text-sm text-blue-600 mt-1">Administrators</div>
+        </div>
+        <div class="bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg p-4 text-center">
+            <div class="text-3xl font-bold text-purple-700">{{ staff_stats.accountant }}</div>
+            <div class="text-sm text-purple-600 mt-1">Accountants</div>
+        </div>
+        <div class="bg-gradient-to-br from-green-100 to-green-200 rounded-lg p-4 text-center">
+            <div class="text-3xl font-bold text-green-700">{{ staff_stats.active_users }}</div>
+            <div class="text-sm text-green-600 mt-1">Active Users</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Financial Modules Section -->
+<div class="mb-8">
+    <h2 class="text-3xl font-bold text-gray-800 mb-2 flex items-center gap-2">
+        <i class="fas fa-th-large text-blue-600"></i> Financial Modules
+    </h2>
+    <p class="text-gray-600 mb-6">Click on any module to access accounting and billing features</p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {% for module in modules %}
+        <a href="{{ module.url }}" class="group block">
+            <div class="bg-white rounded-xl shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 p-6 border-t-4 border-{{ module.color }}-500 h-full">
+                <div class="flex flex-col items-center text-center h-full">
+                    <!-- Icon -->
+                    <div class="bg-{{ module.color }}-100 rounded-full p-5 mb-4 group-hover:bg-{{ module.color }}-500 group-hover:scale-110 transition-all duration-300">
+                        <i class="fas {{ module.icon }} text-{{ module.color }}-600 group-hover:text-white text-4xl transition-colors duration-300"></i>
+                    </div>
+                    
+                    <!-- Title -->
+                    <h3 class="text-lg font-bold text-gray-800 mb-2 group-hover:text-{{ module.color }}-600 transition-colors">
+                        {{ module.name }}
+                    </h3>
+                    
+                    <!-- Description -->
+                    <p class="text-gray-600 text-sm mb-4 flex-grow">{{ module.description }}</p>
+                    
+                    <!-- Badge -->
+                    <div class="mt-auto">
+                        <span class="inline-block bg-{{ module.color }}-100 text-{{ module.color }}-800 px-4 py-1.5 rounded-full text-xs font-semibold group-hover:bg-{{ module.color }}-500 group-hover:text-white transition-all">
+                            {{ module.badge }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Quick Actions Bar -->
+<div class="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl shadow-lg p-6 mb-8">
+    <h3 class="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+        <i class="fas fa-bolt"></i> Quick Actions
+    </h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <a href="/students/create/" class="bg-white hover:bg-blue-50 text-blue-800 font-semibold py-3 px-6 rounded-lg shadow transition duration-300 flex items-center justify-center gap-2">
+            <i class="fas fa-user-plus"></i> Add Student
+        </a>
+        
+        <a href="/billing/invoice/create/" class="bg-white hover:bg-blue-50 text-blue-800 font-semibold py-3 px-6 rounded-lg shadow transition duration-300 flex items-center justify-center gap-2">
+            <i class="fas fa-file-invoice"></i> Create Invoice
+        </a>
+        
+        <a href="/reports/" class="bg-white hover:bg-blue-50 text-blue-800 font-semibold py-3 px-6 rounded-lg shadow transition duration-300 flex items-center justify-center gap-2">
+            <i class="fas fa-file-pdf"></i> Financial Report
+        </a>
+        
+        <a href="/accounting/journal-entry/create/" class="bg-white hover:bg-blue-50 text-blue-800 font-semibold py-3 px-6 rounded-lg shadow transition duration-300 flex items-center justify-center gap-2">
+            <i class="fas fa-book"></i> Journal Entry
+        </a>
+    </div>
+</div>
+
+<!-- Recent Activity & System Info -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Recent Activity -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <i class="fas fa-history text-blue-500"></i> Recent Activity
+        </h3>
+        
+        <div class="space-y-3">
+            <div class="flex items-center p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                <div class="bg-blue-100 rounded-full p-2 mr-4">
+                    <i class="fas fa-info-circle text-blue-600"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-gray-800 font-medium">Welcome to Financial Management System!</p>
+                    <p class="text-gray-600 text-sm">Start managing billing, invoices and accounting records.</p>
+                </div>
+                <span class="text-gray-400 text-xs whitespace-nowrap ml-2">Just now</span>
+            </div>
+            
+            <div class="flex items-center p-3 bg-gray-50 rounded-lg">
+                <div class="bg-gray-200 rounded-full p-2 mr-4">
+                    <i class="fas fa-check-circle text-gray-600"></i>
+                </div>
+                <div class="flex-1">
+                    <p class="text-gray-800 font-medium">Accountant system ready</p>
+                    <p class="text-gray-600 text-sm">All financial modules are operational.</p>
+                </div>
+                <span class="text-gray-400 text-xs whitespace-nowrap ml-2">Today</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- System Information -->
+    <div class="bg-white rounded-xl shadow-md p-6">
+        <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+            <i class="fas fa-info-circle text-green-500"></i> System Information
+        </h3>
+        
+        <div class="space-y-4">
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-calendar-alt text-blue-600 text-xl"></i>
+                    <span class="text-gray-700 font-medium">Current Academic Year</span>
+                </div>
+                <span class="text-gray-800 font-bold">2025-2026</span>
+            </div>
+            
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-percentage text-green-600 text-xl"></i>
+                    <span class="text-gray-700 font-medium">VAT Rate</span>
+                </div>
+                <span class="text-green-700 font-bold">15%</span>
+            </div>
+            
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-database text-purple-600 text-xl"></i>
+                    <span class="text-gray-700 font-medium">Database Status</span>
+                </div>
+                <span class="text-green-700 font-bold flex items-center gap-1">
+                    <i class="fas fa-check-circle"></i> Connected
+                </span>
+            </div>
+            
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-code text-orange-600 text-xl"></i>
+                    <span class="text-gray-700 font-medium">System Version</span>
+                </div>
+                <span class="text-gray-800 font-bold">v1.0.0</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

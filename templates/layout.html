@@ -1,0 +1,113 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}School ERP System{% endblock %}</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+    <!-- Top Navbar -->
+    <nav class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between py-4">
+                <!-- Logo and Brand -->
+                <div class="flex items-center gap-3">
+                    <img src="/media/logo.png" alt="School Logo" class="w-24 h-24 object-contain">
+                    <div>
+                        <h1 class="text-2xl font-bold">Alkawthar International Schools</h1>
+                        <p class="text-xs text-purple-100">Complete School Management Solution</p>
+                    </div>
+                </div>
+                
+                <!-- User Info and Actions -->
+                <div class="flex items-center gap-4">
+                    {% if user.is_authenticated %}
+                        <div class="hidden md:flex items-center gap-2 bg-purple-700 px-4 py-2 rounded-lg">
+                            <i class="fas fa-user-circle text-xl"></i>
+                            <div class="text-sm">
+                                <p class="font-semibold">{{ user.username }}</p>
+                                <p class="text-xs text-purple-100">Administrator</p>
+                            </div>
+                        </div>
+                        <a href="{% url 'admin:password_change' %}" class="bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded-lg transition flex items-center gap-2">
+                            <i class="fas fa-key"></i>
+                            <span class="hidden md:inline">Change Password</span>
+                        </a>
+                        <a href="{% url 'accounts:logout' %}" class="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg transition flex items-center gap-2">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span class="hidden md:inline">Logout</span>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'admin:login' %}" class="bg-green-500 hover:bg-green-600 px-4 py-2 rounded-lg transition">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Login
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    <div class="bg-white border-b shadow-sm">
+        <div class="container mx-auto px-4 py-3">
+            {% block breadcrumb %}
+            <nav class="flex items-center text-sm text-gray-600">
+                <a href="{% url 'dashboard:index' %}" class="hover:text-blue-600 flex items-center gap-1">
+                    <i class="fas fa-home"></i> Dashboard
+                </a>
+                {% block breadcrumb_items %}{% endblock %}
+            </nav>
+            {% endblock %}
+        </div>
+    </div>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mx-auto px-4 mt-4">
+            {% for message in messages %}
+                <div class="{% if message.tags == 'error' %}bg-red-100 border-l-4 border-red-500 text-red-700{% elif message.tags == 'success' %}bg-green-100 border-l-4 border-green-500 text-green-700{% elif message.tags == 'warning' %}bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700{% else %}bg-blue-100 border-l-4 border-blue-500 text-blue-700{% endif %} p-4 rounded mb-2 shadow" role="alert">
+                    <p class="font-medium flex items-center gap-2">
+                        {% if message.tags == 'success' %}<i class="fas fa-check-circle"></i>{% endif %}
+                        {% if message.tags == 'error' %}<i class="fas fa-exclamation-circle"></i>{% endif %}
+                        {% if message.tags == 'warning' %}<i class="fas fa-exclamation-triangle"></i>{% endif %}
+                        {% if message.tags == 'info' %}<i class="fas fa-info-circle"></i>{% endif %}
+                        {{ message }}
+                    </p>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="container mx-auto px-4 py-6">
+            <div class="flex flex-col md:flex-row items-center justify-between">
+                <div class="text-center md:text-left mb-4 md:mb-0">
+                    <p class="font-semibold">&copy; 2026 School ERP System. All Rights Reserved.</p>
+                    <p class="text-sm text-gray-400 mt-1">Developed with Django & Tailwind CSS</p>
+                </div>
+                <div class="flex items-center gap-4 text-sm text-gray-400">
+                    <span><i class="fas fa-code mr-1"></i> Version 1.0.0</span>
+                    <span><i class="fas fa-calendar mr-1"></i> {{ current_year }}</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

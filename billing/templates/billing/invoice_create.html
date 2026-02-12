@@ -1,0 +1,200 @@
+{% extends 'layout.html' %}
+
+{% block title %}Create Invoice - Billing{% endblock %}
+
+{% block breadcrumb_items %}
+    <span class="mx-2 text-gray-400">/</span>
+    <a href="{% url 'billing:list' %}" class="hover:text-blue-600">Invoices</a>
+    <span class="mx-2 text-gray-400">/</span>
+    <span class="text-gray-800 font-medium">Create New</span>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="mb-6">
+    <h1 class="text-3xl font-bold text-gray-800 mb-2">
+        <i class="fas fa-plus-circle text-blue-600 mr-2"></i> Create New Invoice
+    </h1>
+    <p class="text-gray-600">Generate a new invoice for student fees and charges</p>
+</div>
+
+<form method="post" class="space-y-6">
+    {% csrf_token %}
+    
+    <!-- Student Selection -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b">
+            <i class="fas fa-user-graduate text-blue-600 mr-2"></i> Student Information
+        </h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="md:col-span-2">
+                <label class="block text-gray-700 font-semibold mb-2">Select Student <span class="text-red-500">*</span></label>
+                <select name="student_id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">-- Select Student --</option>
+                    {% for student in students %}
+                    <option value="{{ student.student_id }}">{{ student.student_id }} - {{ student.name_english }} ({{ student.name_arabic }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div>
+                <label class="block text-gray-700 font-semibold mb-2">Academic Year <span class="text-red-500">*</span></label>
+                <input type="text" name="academic_year" required value="2024-2025" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            
+            <div>
+                <label class="block text-gray-700 font-semibold mb-2">Invoice Date <span class="text-red-500">*</span></label>
+                <input type="date" name="invoice_date" required value="{{ today|date:'Y-m-d' }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            
+            <div>
+                <label class="block text-gray-700 font-semibold mb-2">Due Date <span class="text-red-500">*</span></label>
+                <input type="date" name="due_date" required value="{{ default_due_date|date:'Y-m-d' }}" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            </div>
+            
+            <div>
+                <label class="block text-gray-700 font-semibold mb-2">Apply Discount (Optional)</label>
+                <select name="discount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    <option value="">-- No Discount --</option>
+                    {% for discount in discounts %}
+                    <option value="{{ discount.id }}">{{ discount.discount_name }} ({% if discount.discount_type == 'percentage' %}{{ discount.discount_value }}%{% else %}{{ discount.discount_value }} SAR{% endif %})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Invoice Items -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b flex items-center justify-between">
+            <span><i class="fas fa-list text-green-600 mr-2"></i> Invoice Items</span>
+            <button type="button" onclick="addInvoiceItem()" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm transition">
+                <i class="fas fa-plus mr-2"></i> Add Item
+            </button>
+        </h2>
+        
+        <div id="invoice-items-container" class="space-y-4">
+            <!-- Initial invoice item -->
+            <div class="invoice-item bg-gray-50 p-4 rounded-lg border border-gray-200">
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Fee Category <span class="text-red-500">*</span></label>
+                        <select name="fee_category[]" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent fee-category-select">
+                            <option value="">-- Select Fee --</option>
+                            {% for category in fee_categories %}
+                            <option value="{{ category.id }}" data-price="{{ category.default_amount }}">{{ category.category_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Description</label>
+                        <input type="text" name="description[]" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Optional details">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Quantity <span class="text-red-500">*</span></label>
+                        <input type="number" name="quantity[]" required value="1" min="1" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent quantity-input">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-gray-700 font-semibold mb-2">Unit Price (SAR) <span class="text-red-500">*</span></label>
+                        <input type="number" name="unit_price[]" required step="0.01" min="0" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent unit-price-input">
+                    </div>
+                    
+                    <div class="flex items-end">
+                        <button type="button" onclick="removeInvoiceItem(this)" class="w-full bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-4 pt-4 border-t">
+            <div class="text-right text-gray-600">
+                <p class="text-sm">Subtotal will be calculated automatically</p>
+                <p class="text-sm">VAT (15%) will be applied</p>
+                <p class="text-sm">Discount will be applied if selected</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notes -->
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-bold text-gray-800 mb-4 pb-2 border-b">
+            <i class="fas fa-sticky-note text-yellow-600 mr-2"></i> Additional Notes
+        </h2>
+        
+        <div>
+            <label class="block text-gray-700 font-semibold mb-2">Notes (Optional)</label>
+            <textarea name="notes" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Add any additional notes or instructions..."></textarea>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="flex justify-end gap-4">
+        <a href="{% url 'billing:list' %}" class="bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg transition">
+            <i class="fas fa-times mr-2"></i> Cancel
+        </a>
+        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition">
+            <i class="fas fa-check mr-2"></i> Create Invoice
+        </button>
+    </div>
+</form>
+
+<script>
+// Auto-fill unit price when fee category is selected
+document.addEventListener('DOMContentLoaded', function() {
+    attachFeeSelectListeners();
+});
+
+function attachFeeSelectListeners() {
+    document.querySelectorAll('.fee-category-select').forEach(select => {
+        select.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const price = selectedOption.getAttribute('data-price');
+            const container = this.closest('.invoice-item');
+            const priceInput = container.querySelector('.unit-price-input');
+            if (price && priceInput) {
+                priceInput.value = price;
+            }
+        });
+    });
+}
+
+function addInvoiceItem() {
+    const container = document.getElementById('invoice-items-container');
+    const firstItem = document.querySelector('.invoice-item');
+    const newItem = firstItem.cloneNode(true);
+    
+    // Reset all inputs in the cloned item
+    newItem.querySelectorAll('input, select').forEach(input => {
+        if (input.type === 'number') {
+            if (input.name === 'quantity[]') {
+                input.value = '1';
+            } else {
+                input.value = '';
+            }
+        } else {
+            input.value = '';
+        }
+    });
+    
+    container.appendChild(newItem);
+    attachFeeSelectListeners();
+}
+
+function removeInvoiceItem(button) {
+    const container = document.getElementById('invoice-items-container');
+    const items = container.querySelectorAll('.invoice-item');
+    
+    if (items.length > 1) {
+        button.closest('.invoice-item').remove();
+    } else {
+        alert('At least one invoice item is required.');
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,353 @@
+{% extends 'layout.html' %}
+
+{% block title %}Invoice {{ invoice.invoice_number }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Header with Actions -->
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">Invoice Details</h1>
+            <p class="text-gray-600 mt-1">Invoice Number: <span class="font-semibold">{{ invoice.invoice_number }}</span></p>
+        </div>
+        <div class="flex gap-3">
+            <a href="{% url 'billing:list' %}" class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition">
+                <i class="fas fa-arrow-left mr-2"></i>Back to List
+            </a>
+            <button onclick="window.print()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                <i class="fas fa-print mr-2"></i>Print
+            </button>
+            {% if invoice.status != 'paid' and invoice.status != 'cancelled' %}
+            <a href="{% url 'billing:payment' invoice.invoice_number %}" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition">
+                <i class="fas fa-money-bill-wave mr-2"></i>Record Payment
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="mb-6">
+        {% if invoice.status == 'paid' %}
+            <span class="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
+                <i class="fas fa-check-circle mr-1"></i>Paid
+            </span>
+        {% elif invoice.status == 'partial' %}
+            <span class="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-full text-sm font-semibold">
+                <i class="fas fa-clock mr-1"></i>Partially Paid
+            </span>
+        {% elif invoice.status == 'pending' %}
+            <span class="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
+                <i class="fas fa-hourglass-half mr-1"></i>Pending
+            </span>
+        {% elif invoice.status == 'overdue' %}
+            <span class="px-4 py-2 bg-red-100 text-red-800 rounded-full text-sm font-semibold">
+                <i class="fas fa-exclamation-triangle mr-1"></i>Overdue
+            </span>
+        {% elif invoice.status == 'cancelled' %}
+            <span class="px-4 py-2 bg-gray-100 text-gray-800 rounded-full text-sm font-semibold">
+                <i class="fas fa-times-circle mr-1"></i>Cancelled
+            </span>
+        {% endif %}
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Main Invoice Details -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- Invoice Information Card -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between mb-4 pb-4 border-b">
+                    <h2 class="text-xl font-bold text-gray-800">Invoice Information</h2>
+                    <div class="text-right">
+                        <p class="text-sm text-gray-600">Issue Date</p>
+                        <p class="font-semibold">{{ invoice.invoice_date|date:"d M Y" }}</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <p class="text-sm text-gray-600">Due Date</p>
+                        <p class="font-semibold">{{ invoice.due_date|date:"d M Y" }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Academic Year</p>
+                        <p class="font-semibold">{{ invoice.academic_year }}</p>
+                    </div>
+                </div>
+
+                {% if invoice.discount %}
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                    <div class="flex items-center">
+                        <i class="fas fa-tag text-green-600 mr-3"></i>
+                        <div>
+                            <p class="font-semibold text-green-800">{{ invoice.discount.discount_name }}</p>
+                            <p class="text-sm text-green-700">
+                                {% if invoice.discount.discount_type == 'percentage' %}
+                                    {{ invoice.discount.discount_value }}% off
+                                {% else %}
+                                    {{ invoice.discount.discount_value }} SAR off
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if invoice.notes %}
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p class="text-sm font-semibold text-blue-800 mb-1">Notes:</p>
+                    <p class="text-sm text-blue-700">{{ invoice.notes }}</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Invoice Items Table -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Invoice Items</h2>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b-2 border-gray-200">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">#</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Fee Category</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Description</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase">Qty</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase">Unit Price</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase">Amount</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            {% for item in invoice.items.all %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-sm text-gray-600">{{ forloop.counter }}</td>
+                                <td class="px-4 py-3">
+                                    <span class="font-medium text-gray-800">{{ item.fee_category.category_name }}</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-gray-600">{{ item.description|default:"-" }}</td>
+                                <td class="px-4 py-3 text-sm text-gray-800 text-right">{{ item.quantity }}</td>
+                                <td class="px-4 py-3 text-sm text-gray-800 text-right">{{ item.unit_price }} SAR</td>
+                                <td class="px-4 py-3 text-sm font-semibold text-gray-900 text-right">{{ item.amount }} SAR</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                                    <i class="fas fa-inbox text-4xl mb-2"></i>
+                                    <p>No items found</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Invoice Summary -->
+                <div class="mt-6 border-t pt-4">
+                    <div class="flex justify-end">
+                        <div class="w-64 space-y-2">
+                            <div class="flex justify-between text-gray-700">
+                                <span>Subtotal:</span>
+                                <span class="font-semibold">{{ invoice.subtotal_amount }} SAR</span>
+                            </div>
+                            {% if invoice.discount_amount > 0 %}
+                            <div class="flex justify-between text-green-600">
+                                <span>Discount:</span>
+                                <span class="font-semibold">-{{ invoice.discount_amount }} SAR</span>
+                            </div>
+                            {% endif %}
+                            <div class="flex justify-between text-gray-700">
+                                <span>VAT ({{ invoice.vat_percentage }}%):</span>
+                                <span class="font-semibold">{{ invoice.vat_amount }} SAR</span>
+                            </div>
+                            <div class="flex justify-between text-lg font-bold text-gray-900 pt-2 border-t">
+                                <span>Total Amount:</span>
+                                <span>{{ invoice.total_amount }} SAR</span>
+                            </div>
+                            <div class="flex justify-between text-blue-600 font-semibold">
+                                <span>Paid Amount:</span>
+                                <span>{{ invoice.paid_amount }} SAR</span>
+                            </div>
+                            <div class="flex justify-between text-lg font-bold pt-2 border-t
+                                {% if invoice.balance_amount == 0 %}text-green-600{% else %}text-red-600{% endif %}">
+                                <span>Balance Due:</span>
+                                <span>{{ invoice.balance_amount }} SAR</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payment History -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-xl font-bold text-gray-800">Payment History</h2>
+                    {% if invoice.status != 'paid' and invoice.status != 'cancelled' %}
+                    <a href="{% url 'billing:payment' invoice.invoice_number %}" class="text-green-600 hover:text-green-700 font-semibold text-sm">
+                        <i class="fas fa-plus-circle mr-1"></i>Add Payment
+                    </a>
+                    {% endif %}
+                </div>
+
+                {% if invoice.payments.all %}
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b-2 border-gray-200">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Date</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Payment #</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Receipt #</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Method</th>
+                                <th class="px-4 py-3 text-right text-xs font-semibold text-gray-700 uppercase">Amount</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase">Received By</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            {% for payment in invoice.payments.all %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-4 py-3 text-sm text-gray-800">{{ payment.payment_date|date:"d M Y" }}</td>
+                                <td class="px-4 py-3 text-sm font-medium text-blue-600">{{ payment.payment_number }}</td>
+                                <td class="px-4 py-3 text-sm font-medium text-gray-700">{{ payment.receipt_number }}</td>
+                                <td class="px-4 py-3 text-sm text-gray-700 capitalize">
+                                    {% if payment.payment_method == 'cash' %}
+                                        <i class="fas fa-money-bill-wave text-green-600 mr-1"></i>
+                                    {% elif payment.payment_method == 'card' %}
+                                        <i class="fas fa-credit-card text-blue-600 mr-1"></i>
+                                    {% elif payment.payment_method == 'bank_transfer' %}
+                                        <i class="fas fa-university text-purple-600 mr-1"></i>
+                                    {% elif payment.payment_method == 'cheque' %}
+                                        <i class="fas fa-file-invoice text-orange-600 mr-1"></i>
+                                    {% elif payment.payment_method == 'online' %}
+                                        <i class="fas fa-globe text-teal-600 mr-1"></i>
+                                    {% endif %}
+                                    {{ payment.get_payment_method_display }}
+                                </td>
+                                <td class="px-4 py-3 text-sm font-semibold text-green-600 text-right">{{ payment.amount }} SAR</td>
+                                <td class="px-4 py-3 text-sm text-gray-700">{{ payment.received_by.get_full_name|default:payment.received_by.username }}</td>
+                            </tr>
+                            {% if payment.notes %}
+                            <tr>
+                                <td colspan="6" class="px-4 py-2 bg-gray-50">
+                                    <p class="text-xs text-gray-600"><strong>Note:</strong> {{ payment.notes }}</p>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-8 bg-gray-50 rounded-lg">
+                    <i class="fas fa-receipt text-gray-400 text-4xl mb-3"></i>
+                    <p class="text-gray-500">No payments recorded yet</p>
+                    {% if invoice.status != 'paid' and invoice.status != 'cancelled' %}
+                    <a href="{% url 'billing:payment' invoice.invoice_number %}" class="mt-3 inline-block text-green-600 hover:text-green-700 font-semibold">
+                        Record First Payment
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="lg:col-span-1 space-y-6">
+            <!-- Student Information -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-user-graduate text-blue-600 mr-2"></i>
+                    Student Information
+                </h2>
+                
+                <div class="space-y-3">
+                    <div>
+                        <p class="text-xs text-gray-600 uppercase">Student ID</p>
+                        <a href="{% url 'students:detail' invoice.student.student_id %}" class="font-semibold text-blue-600 hover:text-blue-700">
+                            {{ invoice.student.student_id }}
+                        </a>
+                    </div>
+                    
+                    <div>
+                        <p class="text-xs text-gray-600 uppercase">Name (English)</p>
+                        <p class="font-semibold text-gray-800">{{ invoice.student.name_english }}</p>
+                    </div>
+                    
+                    <div>
+                        <p class="text-xs text-gray-600 uppercase">Name (Arabic)</p>
+                        <p class="font-semibold text-gray-800">{{ invoice.student.name_arabic }}</p>
+                    </div>
+                    
+                    <div>
+                        <p class="text-xs text-gray-600 uppercase">Grade</p>
+                        <p class="font-semibold text-gray-800">{{ invoice.student.current_grade }}</p>
+                    </div>
+                    
+                    <div>
+                        <p class="text-xs text-gray-600 uppercase">Section</p>
+                        <p class="font-semibold text-gray-800">{{ invoice.student.current_section|default:"-" }}</p>
+                    </div>
+
+                    <div class="pt-3 border-t">
+                        <a href="{% url 'students:detail' invoice.student.student_id %}" class="text-blue-600 hover:text-blue-700 text-sm font-semibold">
+                            View Full Profile →
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl shadow-lg p-6 text-white">
+                <h3 class="text-lg font-bold mb-4">Invoice Summary</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-blue-100">Items:</span>
+                        <span class="font-bold text-xl">{{ invoice.items.count }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-blue-100">Payments:</span>
+                        <span class="font-bold text-xl">{{ invoice.payments.count }}</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-3 border-t border-blue-400">
+                        <span class="text-blue-100">Collection Rate:</span>
+                        <span class="font-bold text-xl">
+                            {% widthratio invoice.paid_amount invoice.total_amount 100 %}%
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Metadata -->
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">Metadata</h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Created:</span>
+                        <span class="text-gray-800 font-medium">{{ invoice.created_at|date:"d M Y H:i" }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Updated:</span>
+                        <span class="text-gray-800 font-medium">{{ invoice.updated_at|date:"d M Y H:i" }}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-600">Created By:</span>
+                        <span class="text-gray-800 font-medium">{{ invoice.created_by.get_full_name|default:invoice.created_by.username }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Print Styles -->
+<style>
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+        body {
+            background: white;
+        }
+        .shadow-lg {
+            box-shadow: none;
+        }
+    }
+</style>
+{% endblock %}

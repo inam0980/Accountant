@@ -1,0 +1,182 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}School List - Multi-School ERP{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Page Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">
+                <i class="fas fa-school mr-2 text-blue-600"></i>
+                Schools & Branches
+            </h1>
+            <p class="text-gray-600">Manage and switch between schools</p>
+        </div>
+        {% if user.is_superuser %}
+        <a href="{% url 'schools:school_create' %}" 
+           class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg inline-flex items-center transition shadow-lg">
+            <i class="fas fa-plus mr-2"></i>
+            Add School
+        </a>
+        {% endif %}
+    </div>
+
+    <!-- Filters -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+        <form method="get" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Organization</label>
+                <select name="organization" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Organizations</option>
+                    {% for org in organizations %}
+                    <option value="{{ org.id }}" {% if org.id|stringformat:"s" == selected_organization %}selected{% endif %}>
+                        {{ org.name }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">School Type</label>
+                <select name="school_type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <option value="">All Types</option>
+                    <option value="boys" {% if selected_school_type == "boys" %}selected{% endif %}>Boys School</option>
+                    <option value="girls" {% if selected_school_type == "girls" %}selected{% endif %}>Girls School</option>
+                    <option value="mixed" {% if selected_school_type == "mixed" %}selected{% endif %}>Co-education</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                <input type="text" name="search" value="{{ search_query }}" 
+                       placeholder="School name, code..." 
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="w-full bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg transition">
+                    <i class="fas fa-search mr-2"></i>Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Schools Grid -->
+    {% if schools %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for school in schools %}
+        <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition border-l-4 
+                    {% if request.school and request.school.id == school.id %}border-green-500{% else %}border-blue-500{% endif %}">
+            <div class="p-6">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex-1">
+                        <h3 class="text-xl font-semibold text-gray-800 mb-1">
+                            {{ school.school_name }}
+                            {% if request.school and request.school.id == school.id %}
+                            <span class="ml-2 text-xs bg-green-500 text-white px-2 py-1 rounded-full">
+                                ACTIVE
+                            </span>
+                            {% endif %}
+                        </h3>
+                        {% if school.school_name_arabic %}
+                        <p class="text-gray-600 text-sm mb-2" dir="rtl">{{ school.school_name_arabic }}</p>
+                        {% endif %}
+                        <div class="flex gap-2 mt-2">
+                            <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">
+                                {{ school.get_school_type_display }}
+                            </span>
+                            <span class="inline-block bg-purple-100 text-purple-800 text-xs px-2 py-1 rounded">
+                                {{ school.get_shift_display }}
+                            </span>
+                        </div>
+                    </div>
+                    {% if school.logo %}
+                    <img src="{{ school.logo.url }}" alt="{{ school.school_name }}" 
+                         class="w-12 h-12 object-contain ml-4">
+                    {% endif %}
+                </div>
+
+                <div class="space-y-2 mb-4 text-sm text-gray-600 border-t border-b border-gray-100 py-3">
+                    <p><i class="fas fa-building w-5 text-gray-400"></i>{{ school.organization.name }}</p>
+                    <p><i class="fas fa-code w-5 text-gray-400"></i>{{ school.school_code }}</p>
+                    <p><i class="fas fa-user-tie w-5 text-gray-400"></i>{{ school.principal_name }}</p>
+                    <p><i class="fas fa-envelope w-5 text-gray-400"></i>{{ school.email }}</p>
+                    <p><i class="fas fa-phone w-5 text-gray-400"></i>{{ school.phone }}</p>
+                    <p><i class="fas fa-map-marker-alt w-5 text-gray-400"></i>{{ school.city }}</p>
+                </div>
+
+                <div class="mb-4 bg-gray-50 rounded-lg p-3">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs text-gray-600">Capacity:</span>
+                        <span class="text-sm font-semibold text-gray-800">
+                            {{ school.current_enrollment }} / {{ school.total_capacity }}
+                        </span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div class="bg-blue-600 h-2 rounded-full" style="width: {{ school.enrollment_percentage }}%"></div>
+                    </div>
+                    <p class="text-xs text-gray-600 mt-1 text-right">{{ school.enrollment_percentage }}% filled</p>
+                </div>
+
+                <div class="flex gap-2">
+                    {% if request.school and request.school.id == school.id %}
+                    <a href="{% url 'schools:school_detail' school.pk %}" 
+                       class="flex-1 bg-green-600 hover:bg-green-700 text-white text-center px-4 py-2 rounded-lg transition text-sm font-medium">
+                        <i class="fas fa-eye mr-1"></i>View Dashboard
+                    </a>
+                    {% else %}
+                    <a href="{% url 'schools:school_switch' school.pk %}" 
+                       class="flex-1 bg-blue-600 hover:bg-blue-700 text-white text-center px-4 py-2 rounded-lg transition text-sm font-medium">
+                        <i class="fas fa-exchange-alt mr-1"></i>Switch
+                    </a>
+                    <a href="{% url 'schools:school_detail' school.pk %}" 
+                       class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg transition text-sm">
+                        <i class="fas fa-info-circle"></i>
+                    </a>
+                    {% endif %}
+                    {% if user.is_superuser %}
+                    <a href="{% url 'schools:school_update' school.pk %}" 
+                       class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-lg transition text-sm">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white rounded-lg shadow-md p-12 text-center">
+        <i class="fas fa-school text-6xl text-gray-300 mb-4"></i>
+        <p class="text-gray-600 text-lg mb-4">No schools found</p>
+        {% if user.is_superuser %}
+        <a href="{% url 'schools:school_create' %}" 
+           class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg transition">
+            <i class="fas fa-plus mr-2"></i>Create First School
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Current School Context -->
+    {% if request.school %}
+    <div class="mt-8 bg-green-50 border border-green-200 rounded-lg p-6">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center">
+                <div class="bg-green-500 text-white rounded-full p-3 mr-4">
+                    <i class="fas fa-check text-xl"></i>
+                </div>
+                <div>
+                    <p class="text-green-900 font-semibold text-lg">Currently Active School</p>
+                    <p class="text-green-700">{{ request.school.school_name }} ({{ request.school.school_code }})</p>
+                </div>
+            </div>
+            <a href="{% url 'schools:school_dashboard' %}" 
+               class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg inline-flex items-center transition">
+                <i class="fas fa-tachometer-alt mr-2"></i>
+                Go to Dashboard
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
