@@ -1,6 +1,13 @@
 {% extends 'layout.html' %}
 
-{% block title %}Simplified Tax Invoice{% endblock %}
+{% block page_title %}Simplified Tax Invoice{% endblock %}
+
+{% block breadcrumb_items %}
+    <span class="mx-2 text-gray-400">/</span>
+    <a href="{% url 'billing:list' %}" class="text-gray-600 hover:text-blue-600 transition">Billing</a>
+    <span class="mx-2 text-gray-400">/</span>
+    <span class="text-gray-800 font-medium">Simplified Invoice</span>
+{% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto">
@@ -50,7 +57,7 @@
                         <select name="student" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                             <option value="">Select Student</option>
                             {% for student in students %}
-                            <option value="{{ student.id }}">{{ student.name_english }} ({{ student.student_id }})</option>
+                            <option value="{{ student.id }}">{{ student.get_full_name }} ({{ student.student_id }})</option>
                             {% endfor %}
                         </select>
                     </div>

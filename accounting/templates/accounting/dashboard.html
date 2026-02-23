@@ -1,7 +1,12 @@
 {% extends "layout.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Accounting Dashboard" %}{% endblock %}
+{% block page_title %}{% trans "Accounting Dashboard" %}{% endblock %}
+
+{% block breadcrumb_items %}
+    <span class="mx-2 text-gray-400">/</span>
+    <span class="text-gray-800 font-medium">{% trans "Accounting" %}</span>
+{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-6">

@@ -1,0 +1,281 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}{{ student.first_name }} {{ student.last_name }}{% endblock %}
+
+{% block breadcrumb_items %}
+    <span class="mx-2 text-gray-400">/</span>
+    <a href="{% url 'students:student_list' %}" class="text-gray-600 hover:text-blue-600 transition">Students</a>
+    <span class="mx-2 text-gray-400">/</span>
+    <span class="text-gray-800 font-medium">{{ student.student_id }}</span>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Header with Actions -->
+    <div class="mb-8 flex justify-between items-start">
+        <div class="flex items-center gap-4">
+            <div class="h-20 w-20 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-full flex items-center justify-center shadow-xl">
+                <span class="text-white font-bold text-3xl">{{ student.first_name|slice:":1" }}{{ student.last_name|slice:":1" }}</span>
+            </div>
+            <div>
+                <h1 class="text-3xl font-bold text-gray-900 mb-1">
+                    {{ student.first_name }} {{ student.last_name }}
+                </h1>
+                {% if student.first_name_arabic %}
+                <p class="text-xl text-gray-600 mb-2" dir="rtl">{{ student.first_name_arabic }} {{ student.last_name_arabic }}</p>
+                {% endif %}
+                <div class="flex items-center gap-3">
+                    <span class="px-3 py-1 bg-indigo-100 text-indigo-800 text-sm font-semibold rounded-full">
+                        <i class="fas fa-id-card mr-1"></i>{{ student.student_id }}
+                    </span>
+                    {% if student.is_active %}
+                    <span class="px-3 py-1 bg-green-100 text-green-800 text-sm font-semibold rounded-full">
+                        <i class="fas fa-check-circle mr-1"></i>Active
+                    </span>
+                    {% else %}
+                    <span class="px-3 py-1 bg-red-100 text-red-800 text-sm font-semibold rounded-full">
+                        <i class="fas fa-times-circle mr-1"></i>Inactive
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="flex gap-3">
+            <a href="{% url 'students:student_update' student.pk %}" 
+               class="px-6 py-3 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition font-medium shadow-lg">
+                <i class="fas fa-edit mr-2"></i>Edit
+            </a>
+            <a href="{% url 'students:student_delete' student.pk %}" 
+               class="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition font-medium shadow-lg">
+                <i class="fas fa-trash mr-2"></i>Delete
+            </a>
+        </div>
+    </div>
+
+    <!-- Basic Information -->
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 mb-6 overflow-hidden">
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-id-card"></i>
+                Basic Information
+            </h2>
+        </div>
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Student ID</label>
+                <p class="text-lg text-gray-900 mt-1">{{ student.student_id }}</p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">File Number</label>
+                <p class="text-lg text-gray-900 mt-1">{{ student.file_number|default:"N/A" }}</p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">National ID / Iqama</label>
+                <p class="text-lg text-gray-900 mt-1">{{ student.national_id|default:"N/A" }}</p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">School</label>
+                <p class="text-lg text-gray-900 mt-1">{{ student.school.school_name|default:"N/A" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Information -->
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 mb-6 overflow-hidden">
+        <div class="bg-gradient-to-r from-green-600 to-emerald-600 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-phone"></i>
+                Contact Information
+            </h2>
+        </div>
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Email</label>
+                <p class="text-lg text-gray-900 mt-1">
+                    {% if student.email %}
+                    <a href="mailto:{{ student.email }}" class="text-blue-600 hover:underline">{{ student.email }}</a>
+                    {% else %}
+                    N/A
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Phone</label>
+                <p class="text-lg text-gray-900 mt-1">
+                    {% if student.phone %}
+                    <a href="tel:{{ student.phone }}" class="text-blue-600 hover:underline">{{ student.phone }}</a>
+                    {% else %}
+                    N/A
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Mobile</label>
+                <p class="text-lg text-gray-900 mt-1">
+                    {% if student.mobile %}
+                    <a href="tel:{{ student.mobile }}" class="text-blue-600 hover:underline">{{ student.mobile }}</a>
+                    {% else %}
+                    N/A
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Father/Guardian Information -->
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 mb-6 overflow-hidden">
+        <div class="bg-gradient-to-r from-blue-600 to-cyan-600 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-user-tie"></i>
+                Father/Guardian Information
+            </h2>
+        </div>
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Father Name</label>
+                <p class="text-lg text-gray-900 mt-1">{{ student.father_name|default:"N/A" }}</p>
+                {% if student.father_name_arabic %}
+                <p class="text-md text-gray-600 mt-1" dir="rtl">{{ student.father_name_arabic }}</p>
+                {% endif %}
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Father National ID</label>
+                <p class="text-lg text-gray-900 mt-1">{{ student.father_national_id|default:"N/A" }}</p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Father Phone</label>
+                <p class="text-lg text-gray-900 mt-1">
+                    {% if student.father_phone %}
+                    <a href="tel:{{ student.father_phone }}" class="text-blue-600 hover:underline">{{ student.father_phone }}</a>
+                    {% else %}
+                    N/A
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Father Email</label>
+                <p class="text-lg text-gray-900 mt-1">
+                    {% if student.father_email %}
+                    <a href="mailto:{{ student.father_email }}" class="text-blue-600 hover:underline">{{ student.father_email }}</a>
+                    {% else %}
+                    N/A
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Father Occupation</label>
+                <p class="text-lg text-gray-900 mt-1">{{ student.father_occupation|default:"N/A" }}</p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Mother Name</label>
+                <p class="text-lg text-gray-900 mt-1">{{ student.mother_name|default:"N/A" }}</p>
+                {% if student.mother_name_arabic %}
+                <p class="text-md text-gray-600 mt-1" dir="rtl">{{ student.mother_name_arabic }}</p>
+                {% endif %}
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Mother Phone</label>
+                <p class="text-lg text-gray-900 mt-1">
+                    {% if student.mother_phone %}
+                    <a href="tel:{{ student.mother_phone }}" class="text-blue-600 hover:underline">{{ student.mother_phone }}</a>
+                    {% else %}
+                    N/A
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Academic Information -->
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 mb-6 overflow-hidden">
+        <div class="bg-gradient-to-r from-purple-600 to-pink-600 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-graduation-cap"></i>
+                Academic Information
+            </h2>
+        </div>
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Grade/Class</label>
+                <p class="text-lg text-gray-900 mt-1">{{ student.grade_level|default:"N/A" }}</p>
+                {% if student.grade_level_arabic %}
+                <p class="text-md text-gray-600 mt-1" dir="rtl">{{ student.grade_level_arabic }}</p>
+                {% endif %}
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Academic Year</label>
+                <p class="text-lg text-gray-900 mt-1">{{ student.academic_year|default:"N/A" }}</p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Admission Date</label>
+                <p class="text-lg text-gray-900 mt-1">{{ student.admission_date|date:"F d, Y"|default:"N/A" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emergency Contact & Address -->
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 mb-6 overflow-hidden">
+        <div class="bg-gradient-to-r from-orange-600 to-amber-600 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-ambulance"></i>
+                Emergency Contact & Address
+            </h2>
+        </div>
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Emergency Contact Name</label>
+                <p class="text-lg text-gray-900 mt-1">{{ student.emergency_contact_name|default:"N/A" }}</p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Emergency Contact Phone</label>
+                <p class="text-lg text-gray-900 mt-1">
+                    {% if student.emergency_contact_phone %}
+                    <a href="tel:{{ student.emergency_contact_phone }}" class="text-blue-600 hover:underline">{{ student.emergency_contact_phone }}</a>
+                    {% else %}
+                    N/A
+                    {% endif %}
+                </p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Emergency Contact Relation</label>
+                <p class="text-lg text-gray-900 mt-1">{{ student.emergency_contact_relation|default:"N/A" }}</p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">City</label>
+                <p class="text-lg text-gray-900 mt-1">{{ student.city|default:"N/A" }}</p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">District</label>
+                <p class="text-lg text-gray-900 mt-1">{{ student.district|default:"N/A" }}</p>
+            </div>
+            <div class="md:col-span-2">
+                <label class="text-sm font-semibold text-gray-500 uppercase tracking-wide">Address</label>
+                <p class="text-lg text-gray-900 mt-1">{{ student.address|default:"N/A" }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Additional Information -->
+    {% if student.notes %}
+    <div class="bg-white rounded-xl shadow-lg border border-gray-200 mb-6 overflow-hidden">
+        <div class="bg-gradient-to-r from-gray-600 to-slate-600 px-6 py-4">
+            <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                <i class="fas fa-sticky-note"></i>
+                Notes
+            </h2>
+        </div>
+        <div class="p-6">
+            <p class="text-gray-700 whitespace-pre-line">{{ student.notes }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Back Button -->
+    <div class="flex gap-3">
+        <a href="{% url 'students:student_list' %}" 
+           class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">
+            <i class="fas fa-arrow-left mr-2"></i>Back to List
+        </a>
+    </div>
+</div>
+{% endblock %}

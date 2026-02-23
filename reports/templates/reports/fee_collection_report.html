@@ -1,6 +1,13 @@
 {% extends 'layout.html' %}
 
-{% block title %}Fee Collection Report{% endblock %}
+{% block page_title %}Fee Collection Report{% endblock %}
+
+{% block breadcrumb_items %}
+    <span class="mx-2 text-gray-400">/</span>
+    <a href="{% url 'reports:dashboard' %}" class="text-gray-600 hover:text-blue-600 transition">Reports</a>
+    <span class="mx-2 text-gray-400">/</span>
+    <span class="text-gray-800 font-medium">Fee Collection</span>
+{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto">

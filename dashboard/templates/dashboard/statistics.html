@@ -1,7 +1,14 @@
 {% extends "layout.html" %}
 {% load static %}
 
-{% block title %}Financial Statistics - Accountant{% endblock %}
+{% block page_title %}Financial Statistics{% endblock %}
+
+{% block breadcrumb_items %}
+    <span class="mx-2 text-gray-400">/</span>
+    <a href="{% url 'dashboard:index' %}" class="text-gray-600 hover:text-blue-600 transition">Dashboard</a>
+    <span class="mx-2 text-gray-400">/</span>
+    <span class="text-gray-800 font-medium">Statistics</span>
+{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-4 py-6">

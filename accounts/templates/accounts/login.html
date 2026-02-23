@@ -3,41 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - School Management System</title>
+    <title>Login - Alkawthar International Schools</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #312e81 100%);
+            background-attachment: fixed;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+        
+        .glass-strong {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        /* Floating animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .floating {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        /* Gradient animation */
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .animated-gradient {
+            background-size: 200% 200%;
+            animation: gradient-shift 15s ease infinite;
+        }
+        
+        /* Particle effect */
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(99, 102, 241, 0.3);
+            animation: float-particle 20s infinite;
+        }
+        
+        @keyframes float-particle {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translate(100px, -100vh) scale(0.5); opacity: 0; }
+        }
+    </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen flex items-center justify-center">
-    <div class="max-w-md w-full mx-4">
-        <!-- Login Card -->
-        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden">
-            <!-- Header -->
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 p-8 text-center">
-                <div class="w-48 h-48 mx-auto mb-4">
-                    <img src="/media/logo.png" alt="School Logo" class="w-full h-full object-contain rounded-lg">
-                </div>
-                <h1 class="text-3xl font-bold text-white mb-2">School Management</h1>
-                <p class="text-blue-100">Sign in to your account</p>
+<body class="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    
+    <!-- Animated Background Particles -->
+    <div class="particle" style="width: 60px; height: 60px; left: 10%; bottom: -60px; animation-delay: 0s;"></div>
+    <div class="particle" style="width: 40px; height: 40px; left: 30%; bottom: -40px; animation-delay: 4s;"></div>
+    <div class="particle" style="width: 80px; height: 80px; left: 50%; bottom: -80px; animation-delay: 8s;"></div>
+    <div class="particle" style="width: 50px; height: 50px; left: 70%; bottom: -50px; animation-delay: 12s;"></div>
+    <div class="particle" style="width: 70px; height: 70px; left: 90%; bottom: -70px; animation-delay: 16s;"></div>
+    
+    <div class="max-w-md w-full relative z-10">
+        <!-- Logo Section - Floating -->
+        <div class="text-center mb-8 floating">
+            <div class="w-24 h-24 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-2xl">
+                <i class="fas fa-graduation-cap text-white text-5xl"></i>
             </div>
-
-            <!-- Login Form -->
+            <h1 class="text-4xl font-bold text-white mb-2">Alkawthar Schools</h1>
+            <p class="text-gray-300">Financial Management System</p>
+        </div>
+        
+        <!-- Login Card -->
+        <div class="glass-strong rounded-3xl shadow-2xl overflow-hidden">
             <div class="p-8">
+                <div class="text-center mb-8">
+                    <h2 class="text-3xl font-bold bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">
+                        Welcome Back
+                    </h2>
+                    <p class="text-gray-600">Sign in to access your dashboard</p>
+                </div>
+
                 {% if messages %}
-                    {% for message in messages %}
-                        <div class="mb-4 p-4 rounded-lg {% if message.tags == 'error' %}bg-red-100 border border-red-400 text-red-700{% else %}bg-green-100 border border-green-400 text-green-700{% endif %}">
-                            <div class="flex items-center">
-                                {% if message.tags == 'error' %}
-                                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"></path>
-                                    </svg>
-                                {% else %}
-                                    <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-                                    </svg>
-                                {% endif %}
+                    <div class="mb-6 space-y-2">
+                        {% for message in messages %}
+                            <div class="{% if message.tags == 'error' %}bg-gradient-to-r from-red-500 to-rose-500{% else %}bg-gradient-to-r from-green-500 to-emerald-500{% endif %} text-white p-4 rounded-xl shadow-lg flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-white bg-opacity-20 flex items-center justify-center flex-shrink-0">
+                                    {% if message.tags == 'error' %}
+                                        <i class="fas fa-exclamation-circle"></i>
+                                    {% else %}
+                                        <i class="fas fa-check-circle"></i>
+                                    {% endif %}
+                                </div>
                                 <span class="text-sm font-medium">{{ message }}</span>
                             </div>
-                        </div>
-                    {% endfor %}
+                        {% endfor %}
+                    </div>
                 {% endif %}
 
                 <form method="POST" action="{% url 'accounts:login' %}" class="space-y-6">
@@ -50,10 +127,10 @@
                             Username or Email
                         </label>
                         <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                                </svg>
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center">
+                                    <i class="fas fa-user text-indigo-600"></i>
+                                </div>
                             </div>
                             <input 
                                 type="text" 
@@ -61,7 +138,7 @@
                                 name="username" 
                                 required 
                                 autofocus
-                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150"
+                                class="block w-full pl-16 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition duration-200 bg-gray-50 hover:bg-white font-medium"
                                 placeholder="Enter your username or email"
                             >
                         </div>
@@ -73,17 +150,17 @@
                             Password
                         </label>
                         <div class="relative">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                                </svg>
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center">
+                                    <i class="fas fa-lock text-purple-600"></i>
+                                </div>
                             </div>
                             <input 
                                 type="password" 
                                 id="password" 
                                 name="password" 
                                 required
-                                class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150"
+                                class="block w-full pl-16 pr-4 py-4 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 transition duration-200 bg-gray-50 hover:bg-white font-medium"
                                 placeholder="Enter your password"
                             >
                         </div>
@@ -92,53 +169,63 @@
                     <!-- Submit Button -->
                     <button 
                         type="submit"
-                        class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 px-4 rounded-lg hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transform transition hover:scale-[1.02] duration-150 shadow-lg"
+                        class="w-full bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 animated-gradient text-white font-bold py-4 px-6 rounded-xl hover:shadow-2xl focus:outline-none focus:ring-4 focus:ring-indigo-300 transform transition hover:scale-[1.02] duration-200 shadow-lg flex items-center justify-center gap-2"
                     >
-                        Sign In
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>Sign In to Dashboard</span>
                     </button>
                 </form>
 
                 <!-- Role Information -->
-                <div class="mt-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                    <p class="text-xs text-gray-600 text-center mb-3 font-semibold">Available Roles:</p>
-                    <div class="grid grid-cols-2 gap-2 text-xs">
-                        <div class="flex items-center space-x-2">
-                            <span class="w-2 h-2 bg-purple-500 rounded-full"></span>
-                            <span class="text-gray-700">Admin</span>
+                <div class="mt-8 p-6 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl border-2 border-gray-200">
+                    <p class="text-sm text-gray-700 font-semibold mb-4 flex items-center gap-2">
+                        <i class="fas fa-users-cog text-indigo-600"></i>
+                        Available System Roles
+                    </p>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="flex items-center gap-2 text-sm">
+                            <div class="w-2 h-2 bg-gradient-to-r from-purple-500 to-purple-600 rounded-full"></div>
+                            <span class="text-gray-700 font-medium">Administrator</span>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
-                            <span class="text-gray-700">Teacher</span>
+                        <div class="flex items-center gap-2 text-sm">
+                            <div class="w-2 h-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full"></div>
+                            <span class="text-gray-700 font-medium">Teacher</span>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="w-2 h-2 bg-green-500 rounded-full"></span>
-                            <span class="text-gray-700">Staff</span>
+                        <div class="flex items-center gap-2 text-sm">
+                            <div class="w-2 h-2 bg-gradient-to-r from-green-500 to-green-600 rounded-full"></div>
+                            <span class="text-gray-700 font-medium">Staff</span>
                         </div>
-                        <div class="flex items-center space-x-2">
-                            <span class="w-2 h-2 bg-orange-500 rounded-full"></span>
-                            <span class="text-gray-700">Accountant</span>
+                        <div class="flex items-center gap-2 text-sm">
+                            <div class="w-2 h-2 bg-gradient-to-r from-orange-500 to-orange-600 rounded-full"></div>
+                            <span class="text-gray-700 font-medium">Accountant</span>
                         </div>
-                        <div class="flex items-center space-x-2 col-span-2 justify-center">
-                            <span class="w-2 h-2 bg-pink-500 rounded-full"></span>
-                            <span class="text-gray-700">HR</span>
+                        <div class="flex items-center gap-2 text-sm col-span-2 justify-center">
+                            <div class="w-2 h-2 bg-gradient-to-r from-pink-500 to-pink-600 rounded-full"></div>
+                            <span class="text-gray-700 font-medium">Human Resources</span>
                         </div>
                     </div>
-                    <p class="text-xs text-gray-500 text-center mt-3 italic">Role is auto-detected after login</p>
+                    <div class="mt-4 pt-4 border-t border-gray-300">
+                        <p class="text-xs text-gray-500 text-center italic flex items-center justify-center gap-2">
+                            <i class="fas fa-info-circle"></i>
+                            Your role is automatically detected after login
+                        </p>
+                    </div>
                 </div>
             </div>
 
             <!-- Footer -->
-            <div class="bg-gray-50 px-8 py-4 border-t border-gray-200">
-                <p class="text-xs text-gray-600 text-center">
-                    © 2026 School Management System. All rights reserved.
+            <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-8 py-4 border-t-2 border-gray-200">
+                <p class="text-xs text-gray-600 text-center font-medium">
+                    © 2026 Alkawthar International Schools. All rights reserved.
                 </p>
             </div>
         </div>
 
         <!-- Security Notice -->
-        <div class="mt-4 text-center">
-            <p class="text-xs text-gray-600">
-                🔒 Your credentials are encrypted and secure
+        <div class="mt-6 text-center">
+            <p class="text-sm text-gray-300 flex items-center justify-center gap-2">
+                <i class="fas fa-shield-alt text-green-400"></i>
+                Your credentials are encrypted and secure
             </p>
         </div>
     </div>

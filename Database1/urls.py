@@ -14,5 +14,7 @@ urlpatterns = [
     path('billing/', include('billing.urls')),  # Billing and invoices
     path('reports/', include('reports.urls')),  # Financial reports
     path('accounts/', include('accounts.urls')),  # User authentication
+    path('settings/', include('settings_app.urls')),  # System settings and configuration
+    path('students/', include('students.urls')),  # Student management
 
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) #1

@@ -1,7 +1,14 @@
 {% extends "layout.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Chart of Accounts" %}{% endblock %}
+{% block page_title %}{% trans "Chart of Accounts" %}{% endblock %}
+
+{% block breadcrumb_items %}
+    <span class="mx-2 text-gray-400">/</span>
+    <a href="{% url 'accounting:dashboard' %}" class="text-gray-600 hover:text-blue-600 transition">Accounting</a>
+    <span class="mx-2 text-gray-400">/</span>
+    <span class="text-gray-800 font-medium">{% trans "Chart of Accounts" %}</span>
+{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-6">

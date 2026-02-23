@@ -132,7 +132,7 @@ class Invoice(models.Model):
         verbose_name_plural = 'Invoices'
     
     def __str__(self):
-        return f"{self.invoice_number} - {self.student.name_english} - {self.total_amount} SAR"
+        return f"{self.invoice_number} - {self.student.get_full_name()} - {self.total_amount} SAR"
     
     def save(self, *args, **kwargs):
         if not self.invoice_number:

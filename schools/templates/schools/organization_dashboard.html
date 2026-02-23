@@ -1,7 +1,14 @@
-{% extends 'base.html' %}
+{% extends 'layout.html' %}
 {% load static %}
 
-{% block title %}Organization Dashboard - Multi-School ERP{% endblock %}
+{% block page_title %}Organization Dashboard{% endblock %}
+
+{% block breadcrumb_items %}
+    <span class="mx-2 text-gray-400">/</span>
+    <a href="{% url 'schools:school_dashboard' %}" class="text-gray-600 hover:text-blue-600 transition">Schools</a>
+    <span class="mx-2 text-gray-400">/</span>
+    <span class="text-gray-800 font-medium">Organizations</span>
+{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">

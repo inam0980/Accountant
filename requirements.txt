@@ -15,8 +15,8 @@ hijri-converter>=2.3.0  # For Hijri calendar support
 
 # PDF Generation (Phase 4 - INSTALLED)
 reportlab>=4.0.0  # For invoice and report PDFs
+qrcode>=7.4.0  # QR codes for invoices
 # WeasyPrint>=60.0  # Alternative PDF generator
-# qrcode>=7.4.0  # QR codes for invoices
 # arabic-reshaper>=3.0  # Arabic text in PDFs
 # python-bidi>=0.4  # Bidirectional text
 

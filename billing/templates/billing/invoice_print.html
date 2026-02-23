@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice {{ invoice.invoice_number }} - Print</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        @page {
+            size: A4;
+            margin: 15mm;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #000;
+        }
+        
+        .invoice-container {
+            width: 100%;
+            max-width: 210mm;
+            margin: 0 auto;
+            border: 2px solid #000;
+            padding: 10mm;
+        }
+        
+        /* Header Section */
+        .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 15px;
+        }
+        
+        .header-left, .header-right {
+            flex: 1;
+            font-size: 9pt;
+        }
+        
+        .header-left {
+            text-align: right;
+            direction: rtl;
+            padding-left: 10px;
+        }
+        
+        .header-right {
+            text-align: left;
+            padding-right: 10px;
+        }
+        
+        .header-center {
+            flex: 0 0 120px;
+            text-align: center;
+        }
+        
+        .header-center img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 50%;
+            border: 2px solid #000;
+        }
+        
+        .school-name {
+            font-weight: bold;
+            font-size: 11pt;
+            margin-bottom: 5px;
+        }
+        
+        .header-info {
+            line-height: 1.6;
+        }
+        
+        /* Title Section */
+        .invoice-title {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .invoice-title h1 {
+            font-size: 18pt;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .invoice-title h2 {
+            font-size: 16pt;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .invoice-title .subtitle {
+            font-size: 12pt;
+            color: #666;
+        }
+        
+        /* Invoice Details */
+        .invoice-details {
+            margin: 20px 0;
+            border: 1px solid #000;
+        }
+        
+        .invoice-details table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .invoice-details td {
+            padding: 8px;
+            border: 1px solid #000;
+            font-size: 10pt;
+        }
+        
+        .label-ar {
+            text-align: right;
+            direction: rtl;
+            font-weight: bold;
+            background-color: #f5f5f5;
+            width: 20%;
+        }
+        
+        .label-en {
+            text-align: left;
+            font-weight: bold;
+            background-color: #f5f5f5;
+            width: 20%;
+        }
+        
+        .value {
+            text-align: center;
+            width: 30%;
+        }
+        
+        /* Items Table */
+        .items-section {
+            margin: 20px 0;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1px solid #000;
+            margin-bottom: 15px;
+        }
+        
+        .items-table th {
+            background-color: #f5f5f5;
+            border: 1px solid #000;
+            padding: 8px 4px;
+            font-size: 9pt;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .items-table td {
+            border: 1px solid #000;
+            padding: 8px 4px;
+            text-align: center;
+            font-size: 10pt;
+        }
+        
+        .items-table .desc-cell {
+            text-align: right;
+            direction: rtl;
+            padding-right: 8px;
+        }
+        
+        .bilingual-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            line-height: 1.3;
+        }
+        
+        .header-ar {
+            direction: rtl;
+            font-size: 9pt;
+        }
+        
+        .header-en {
+            font-size: 8pt;
+            color: #333;
+        }
+        
+        /* QR Code and Remarks Section */
+        .bottom-section {
+            display: flex;
+            margin: 15px 0;
+            border: 1px solid #000;
+        }
+        
+        .qr-section {
+            flex: 0 0 150px;
+            border-right: 1px solid #000;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .qr-code {
+            width: 120px;
+            height: 120px;
+            background-color: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            border: 1px solid #ccc;
+        }
+        
+        .remarks-section {
+            flex: 1;
+            padding: 10px;
+        }
+        
+        .remarks-label {
+            font-weight: bold;
+            font-size: 10pt;
+            margin-bottom: 5px;
+        }
+        
+        /* Summary Section */
+        .summary-section {
+            border: 1px solid #000;
+            margin: 15px 0;
+        }
+        
+        .summary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .summary-table td {
+            padding: 10px;
+            border: 1px solid #000;
+            font-size: 11pt;
+        }
+        
+        .summary-label {
+            text-align: center;
+            direction: rtl;
+            font-weight: bold;
+            background-color: #f5f5f5;
+            width: 50%;
+        }
+        
+        .summary-value {
+            text-align: center;
+            font-weight: bold;
+            width: 50%;
+        }
+        
+        .total-row {
+            background-color: #e8e8e8;
+            font-size: 12pt;
+        }
+        
+        /* Footer */
+        .invoice-footer {
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid #000;
+            text-align: center;
+            direction: rtl;
+            font-size: 8pt;
+            line-height: 1.6;
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            
+            .invoice-container {
+                border: none;
+                max-width: 100%;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            @page {
+                margin: 10mm;
+            }
+        }
+        
+        /* Print Button */
+        .print-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14pt;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        
+        .print-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Print Button -->
+    <button onclick="window.print()" class="print-button no-print">
+        <i class="fas fa-print"></i> طباعة / Print
+    </button>
+
+    <div class="invoice-container">
+        <!-- Header -->
+        <div class="invoice-header">
+            <!-- Right Side - Arabic -->
+            <div class="header-left">
+                <div class="school-name">{{ invoice.student.school.school_name_arabic|default:invoice.student.school.school_name }}</div>
+                <div class="header-info">
+                    {{ invoice.student.school.address }}<br>
+                    {% if invoice.student.school.organization.vat_registration_number %}
+                    الرقم الضريبي: {{ invoice.student.school.organization.vat_registration_number }}<br>
+                    {% endif %}
+                    {% if invoice.student.school.organization.cr_number %}
+                    رقم السجل التجاري: {{ invoice.student.school.organization.cr_number }}<br>
+                    {% endif %}
+                    هاتف: {{ invoice.student.school.phone }}<br>
+                    {{ invoice.student.school.email }}<br>
+                    {% if invoice.student.school.organization.website %}
+                    {{ invoice.student.school.organization.website }}
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Center - Logo -->
+            <div class="header-center">
+                {% if invoice.student.school.logo %}
+                <img src="{{ invoice.student.school.logo.url }}" alt="School Logo">
+                {% elif invoice.student.school.organization.logo %}
+                <img src="{{ invoice.student.school.organization.logo.url }}" alt="School Logo">
+                {% else %}
+                <img src="/media/logo.jpeg" alt="School Logo">
+                {% endif %}
+            </div>
+            
+            <!-- Left Side - English -->
+            <div class="header-right">
+                <div class="school-name">{{ invoice.student.school.school_name }}</div>
+                <div class="header-info">
+                    {{ invoice.student.school.address }}<br>
+                    {% if invoice.student.school.organization.vat_registration_number %}
+                    VAT Reg: {{ invoice.student.school.organization.vat_registration_number }}<br>
+                    {% endif %}
+                    {% if invoice.student.school.organization.cr_number %}
+                    CR Number: {{ invoice.student.school.organization.cr_number }}<br>
+                    {% endif %}
+                    Mobile: {{ invoice.student.school.phone }}<br>
+                    {{ invoice.student.school.email }}<br>
+                    {% if invoice.student.school.organization.website %}
+                    {{ invoice.student.school.organization.website }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Title -->
+        <div class="invoice-title">
+            <h1>فاتورة ضريبية مبسطة</h1>
+            <h2>Simplified Tax Invoice</h2>
+            <div class="subtitle">{% if invoice.is_reprinted %}(RE-PRINTED){% endif %}</div>
+        </div>
+
+        <!-- Invoice Details -->
+        <div class="invoice-details">
+            <table>
+                <tr>
+                    <td class="label-ar">رقم الفاتورة</td>
+                    <td class="value">{{ invoice.invoice_number }}</td>
+                    <td class="label-en">Transaction No.</td>
+                    <td class="label-ar">رقم هوية ولي الأمر</td>
+                    <td class="value">{{ invoice.student.father_national_id|default:"N/A" }}</td>
+                    <td class="label-en">Father's ID</td>
+                </tr>
+                <tr>
+                    <td class="label-ar">تاريخ</td>
+                    <td class="value">{{ invoice.invoice_date|date:"d/m/Y" }}</td>
+                    <td class="label-en">Date</td>
+                    <td class="label-ar">اسم ولي الأمر</td>
+                    <td class="value" style="direction: rtl;">{{ invoice.student.father_name_arabic|default:invoice.student.father_name|default:"N/A" }}</td>
+                    <td class="label-en">Father Name</td>
+                </tr>
+                <tr>
+                    <td class="label-ar" rowspan="2">المرحلة الدراسية</td>
+                    <td class="value" rowspan="2" style="direction: rtl;">{{ invoice.student.grade_level_arabic|default:invoice.student.grade_level|default:"N/A" }}</td>
+                    <td class="label-en" rowspan="2">Grade</td>
+                    <td class="label-ar">اسم الطالب</td>
+                    <td class="value" style="direction: rtl;">{{ invoice.student.get_full_name_arabic|default:invoice.student.get_full_name }}</td>
+                    <td class="label-en">Student Name</td>
+                </tr>
+                <tr>
+                    <td class="label-ar">رقم هوية الطالب</td>
+                    <td class="value">{{ invoice.student.national_id|default:"N/A" }}</td>
+                    <td class="label-en">Student National ID</td>
+                </tr>
+                <tr>
+                    <td colspan="3"></td>
+                    <td class="label-ar">رقم ملف الطالب</td>
+                    <td class="value">{{ invoice.student.file_number|default:invoice.student.student_id }}</td>
+                    <td class="label-en">Student File No.</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Items Table and QR Code -->
+        <div class="items-section">
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th style="width: 3%;">
+                            <div class="bilingual-header">
+                                <span class="header-ar">م</span>
+                                <span class="header-en">#</span>
+                            </div>
+                        </th>
+                        <th style="width: 27%;">
+                            <div class="bilingual-header">
+                                <span class="header-ar">البيان</span>
+                                <span class="header-en">Description</span>
+                            </div>
+                        </th>
+                        <th style="width: 8%;">
+                            <div class="bilingual-header">
+                                <span class="header-ar">كمية</span>
+                                <span class="header-en">Qty</span>
+                            </div>
+                        </th>
+                        <th style="width: 12%;">
+                            <div class="bilingual-header">
+                                <span class="header-ar">مبلغ الخدمة</span>
+                                <span class="header-en">Gross Amount</span>
+                            </div>
+                        </th>
+                        <th style="width: 10%;">
+                            <div class="bilingual-header">
+                                <span class="header-ar">مبلغ التخفيض</span>
+                                <span class="header-en">Discount Amount</span>
+                            </div>
+                        </th>
+                        <th style="width: 12%;">
+                            <div class="bilingual-header">
+                                <span class="header-ar">إجمالي المبلغ قبل الضريبة</span>
+                                <span class="header-en">Net Amount Before VAT</span>
+                            </div>
+                        </th>
+                        <th style="width: 8%;">
+                            <div class="bilingual-header">
+                                <span class="header-ar">الضريبة (%)</span>
+                                <span class="header-en">VAT Rate (%)</span>
+                            </div>
+                        </th>
+                        <th style="width: 10%;">
+                            <div class="bilingual-header">
+                                <span class="header-ar">قيمة الضريبة المضافة</span>
+                                <span class="header-en">VAT Amount</span>
+                            </div>
+                        </th>
+                        <th style="width: 10%;">
+                            <div class="bilingual-header">
+                                <span class="header-ar">الإجمالي مع الضريبة المضافة</span>
+                                <span class="header-en">Total Amount with VAT</span>
+                            </div>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td class="desc-cell">
+                            {{ item.fee_category.category_name_arabic|default:item.fee_category.category_name }}
+                            {% if item.description %}
+                            <br><small>{{ item.description }}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ item.quantity }}</td>
+                        <td>{{ item.total_amount|floatformat:2 }}</td>
+                        <td>0.00</td>
+                        <td>{{ item.total_amount|floatformat:2 }}</td>
+                        <td>0</td>
+                        <td>0.00</td>
+                        <td>{{ item.total_amount|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- QR Code and Remarks -->
+        <div class="bottom-section">
+            <div class="qr-section">
+                <div class="qr-code">
+                    {% if qr_code %}
+                    <img src="{{ qr_code }}" alt="Invoice QR Code" style="width: 100%; height: 100%;">
+                    {% else %}
+                    <span style="font-size: 10pt; color: #999;">QR CODE</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="remarks-section">
+                <div class="remarks-label">Remarks / ملاحظات:</div>
+                <div style="margin-top: 10px; min-height: 100px;">
+                    {% if invoice.notes %}
+                    {{ invoice.notes }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary Section -->
+        <div class="summary-section">
+            <table class="summary-table">
+                <tr>
+                    <td class="summary-label">
+                        المبلغ الصافي قبل الضريبة المضافة<br>
+                        <small style="font-weight: normal;">Net Amount Before VAT</small>
+                    </td>
+                    <td class="summary-value">{{ invoice.subtotal|floatformat:2 }}</td>
+                </tr>
+                <tr>
+                    <td class="summary-label">
+                        قيمة الضريبة المضافة<br>
+                        <small style="font-weight: normal;">VAT Amount</small>
+                    </td>
+                    <td class="summary-value">{{ invoice.vat_amount|floatformat:2 }}</td>
+                </tr>
+                <tr class="total-row">
+                    <td class="summary-label">
+                        الإجمالي شامل ضريبة القيمة المضافة<br>
+                        <small style="font-weight: normal;">Total Amount with VAT</small>
+                    </td>
+                    <td class="summary-value">{{ invoice.total_amount|floatformat:2 }}</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="invoice-footer">
+            المنشأة الضريبية التابعة لشركة المضافة يجب تحمل المبلغ الضريبة المضافة على المنتجات الخدمية المضافة في الفواتير.<br>
+            The registered taxpayer is required to settle the VAT amount included in the taxable services shown on the invoice.
+        </div>
+    </div>
+
+    <!-- FontAwesome for icons -->
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</body>
+</html>

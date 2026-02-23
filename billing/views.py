@@ -16,6 +16,8 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.units import inch
 from io import BytesIO
+import qrcode
+import base64
 
 # Create your views here.
 
@@ -32,8 +34,10 @@ def invoice_list(request):
     if search_query:
         invoices = invoices.filter(
             Q(invoice_number__icontains=search_query) |
-            Q(student__name_english__icontains=search_query) |
-            Q(student__name_arabic__icontains=search_query) |
+            Q(student__first_name__icontains=search_query) |
+            Q(student__last_name__icontains=search_query) |
+            Q(student__first_name_arabic__icontains=search_query) |
+            Q(student__last_name_arabic__icontains=search_query) |
             Q(student__student_id__icontains=search_query)
         )
     
@@ -105,6 +109,7 @@ def invoice_detail(request, invoice_number):
 
 
 @login_required
+@module_required('billing')
 def invoice_create(request):
     """Create new invoice"""
     if request.method == 'POST':
@@ -169,7 +174,7 @@ def invoice_create(request):
 
 def get_create_context():
     """Helper function to get context for invoice creation"""
-    students = Student.objects.filter(is_active=True).order_by('name_english')
+    students = Student.objects.filter(is_active=True).order_by('first_name', 'last_name')
     fee_categories = FeeCategory.objects.filter(is_active=True).order_by('category_name')
     discounts = Discount.objects.filter(is_active=True).order_by('discount_name')
     
@@ -263,7 +268,8 @@ def payment_list(request):
             Q(payment_number__icontains=search_query) |
             Q(receipt_number__icontains=search_query) |
             Q(invoice__invoice_number__icontains=search_query) |
-            Q(invoice__student__name_english__icontains=search_query)
+            Q(invoice__student__first_name__icontains=search_query) |
+            Q(invoice__student__last_name__icontains=search_query)
         )
     
     # Filter by payment method
@@ -321,10 +327,39 @@ def invoice_print(request, invoice_number):
     items = invoice.items.select_related('fee_category').all()
     payments = invoice.payments.all()
     
+    # Generate QR Code with invoice information
+    qr_data = f"""Invoice: {invoice.invoice_number}
+Student: {invoice.student.get_full_name()}
+Date: {invoice.invoice_date.strftime('%d/%m/%Y')}
+Amount: {invoice.total_amount} SAR
+VAT: {invoice.vat_amount} SAR
+Status: {invoice.get_status_display()}"""
+    
+    # Create QR code
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(qr_data)
+    qr.make(fit=True)
+    
+    # Generate QR code image
+    img = qr.make_image(fill_color="black", back_color="white")
+    
+    # Convert to base64 for embedding in HTML
+    buffer = BytesIO()
+    img.save(buffer, format='PNG')
+    buffer.seek(0)
+    qr_code_base64 = base64.b64encode(buffer.getvalue()).decode()
+    qr_code_data_uri = f"data:image/png;base64,{qr_code_base64}"
+    
     context = {
         'invoice': invoice,
         'items': items,
         'payments': payments,
+        'qr_code': qr_code_data_uri,
     }
     
     return render(request, 'billing/invoice_print.html', context)
@@ -367,7 +402,7 @@ def export_invoices_excel(invoices):
         data = [
             invoice.invoice_number,
             invoice.student.student_id,
-            invoice.student.name_english,
+            invoice.student.get_full_name(),
             invoice.academic_year,
             invoice.invoice_date.strftime('%d/%m/%Y'),
             invoice.due_date.strftime('%d/%m/%Y'),
@@ -440,7 +475,7 @@ def export_invoices_pdf(invoices):
         data.append([
             invoice.invoice_number,
             invoice.student.student_id,
-            invoice.student.name_english[:20],  # Truncate long names
+            invoice.student.get_full_name()[:20],  # Truncate long names
             invoice.invoice_date.strftime('%d/%m/%Y'),
             invoice.due_date.strftime('%d/%m/%Y'),
             f"{invoice.total_amount:.2f}",

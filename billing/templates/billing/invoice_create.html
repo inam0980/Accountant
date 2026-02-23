@@ -1,10 +1,10 @@
 {% extends 'layout.html' %}
 
-{% block title %}Create Invoice - Billing{% endblock %}
+{% block page_title %}Create Invoice{% endblock %}
 
 {% block breadcrumb_items %}
     <span class="mx-2 text-gray-400">/</span>
-    <a href="{% url 'billing:list' %}" class="hover:text-blue-600">Invoices</a>
+    <a href="{% url 'billing:list' %}" class="text-gray-600 hover:text-blue-600 transition">Invoices</a>
     <span class="mx-2 text-gray-400">/</span>
     <span class="text-gray-800 font-medium">Create New</span>
 {% endblock %}
@@ -33,7 +33,7 @@
                 <select name="student_id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option value="">-- Select Student --</option>
                     {% for student in students %}
-                    <option value="{{ student.student_id }}">{{ student.student_id }} - {{ student.name_english }} ({{ student.name_arabic }})</option>
+                    <option value="{{ student.student_id }}">{{ student.student_id }} - {{ student.get_full_name }}{% if student.get_full_name_arabic %} ({{ student.get_full_name_arabic }}){% endif %}</option>
                     {% endfor %}
                 </select>
             </div>

@@ -1,7 +1,16 @@
 {% extends "layout.html" %}
 {% load i18n %}
 
-{% block title %}{{ action }} {% trans "Journal Entry" %}{% endblock %}
+{% block page_title %}{{ action }} {% trans "Journal Entry" %}{% endblock %}
+
+{% block breadcrumb_items %}
+    <span class="mx-2 text-gray-400">/</span>
+    <a href="{% url 'accounting:dashboard' %}" class="text-gray-600 hover:text-blue-600 transition">Accounting</a>
+    <span class="mx-2 text-gray-400">/</span>
+    <a href="{% url 'accounting:journal_entry_list' %}" class="text-gray-600 hover:text-blue-600 transition">Journal Entries</a>
+    <span class="mx-2 text-gray-400">/</span>
+    <span class="text-gray-800 font-medium">{{ action }}</span>
+{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-4 py-6 max-w-6xl">

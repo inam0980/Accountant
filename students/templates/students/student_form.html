@@ -1,0 +1,300 @@
+{% extends 'layout.html' %}
+
+{% block page_title %}{% if student %}Edit Student{% else %}Create New Student{% endif %}{% endblock %}
+
+{% block breadcrumb_items %}
+    <span class="mx-2 text-gray-400">/</span>
+    <a href="{% url 'students:student_list' %}" class="text-gray-600 hover:text-blue-600 transition">Students</a>
+    <span class="mx-2 text-gray-400">/</span>
+    <span class="text-gray-800 font-medium">{% if student %}Edit{% else %}Create{% endif %}</span>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-900 mb-2">
+            <i class="fas fa-user-graduate text-indigo-600 mr-2"></i>
+            {% if student %}Edit Student{% else %}Create New Student{% endif %}
+        </h1>
+        <p class="text-gray-600">{% if student %}Update student information{% else %}Add a new student to the system{% endif %}</p>
+    </div>
+
+    <!-- Form Card -->
+    <form method="post" class="bg-white rounded-xl shadow-lg border border-gray-200">
+        {% csrf_token %}
+        
+        <!-- Basic Information -->
+        <div class="border-b border-gray-200 bg-gradient-to-r from-indigo-50 to-purple-50 px-8 py-4">
+            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <i class="fas fa-id-card text-indigo-600"></i>
+                Basic Information
+            </h2>
+        </div>
+        
+        <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="md:col-span-2 grid grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Student ID <span class="text-red-500">*</span></label>
+                    <input type="text" name="student_id" value="{{ student.student_id|default:'' }}" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">School</label>
+                    <select name="school" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+                        <option value="">Select School</option>
+                        {% for school in schools %}
+                        <option value="{{ school.id }}" {% if student.school_id == school.id %}selected{% endif %}>
+                            {{ school.school_name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">First Name <span class="text-red-500">*</span></label>
+                <input type="text" name="first_name" value="{{ student.first_name|default:'' }}" required
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Last Name <span class="text-red-500">*</span></label>
+                <input type="text" name="last_name" value="{{ student.last_name|default:'' }}" required
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">First Name (Arabic)</label>
+                <input type="text" name="first_name_arabic" value="{{ student.first_name_arabic|default:'' }}" dir="rtl"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Last Name (Arabic)</label>
+                <input type="text" name="last_name_arabic" value="{{ student.last_name_arabic|default:'' }}" dir="rtl"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">National ID / Iqama</label>
+                <input type="text" name="national_id" value="{{ student.national_id|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">File Number</label>
+                <input type="text" name="file_number" value="{{ student.file_number|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500">
+            </div>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="border-t border-b border-gray-200 bg-gradient-to-r from-green-50 to-emerald-50 px-8 py-4">
+            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <i class="fas fa-phone text-green-600"></i>
+                Contact Information
+            </h2>
+        </div>
+        
+        <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                <input type="email" name="email" value="{{ student.email|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Phone</label>
+                <input type="tel" name="phone" value="{{ student.phone|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Mobile</label>
+                <input type="tel" name="mobile" value="{{ student.mobile|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500">
+            </div>
+        </div>
+
+        <!-- Father Information -->
+        <div class="border-t border-b border-gray-200 bg-gradient-to-r from-blue-50 to-cyan-50 px-8 py-4">
+            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <i class="fas fa-user-tie text-blue-600"></i>
+                Father/Guardian Information
+            </h2>
+        </div>
+        
+        <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Father Name</label>
+                <input type="text" name="father_name" value="{{ student.father_name|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Father Name (Arabic)</label>
+                <input type="text" name="father_name_arabic" value="{{ student.father_name_arabic|default:'' }}" dir="rtl"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Father National ID</label>
+                <input type="text" name="father_national_id" value="{{ student.father_national_id|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Father Phone</label>
+                <input type="tel" name="father_phone" value="{{ student.father_phone|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Father Email</label>
+                <input type="email" name="father_email" value="{{ student.father_email|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Father Occupation</label>
+                <input type="text" name="father_occupation" value="{{ student.father_occupation|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Mother Name</label>
+                <input type="text" name="mother_name" value="{{ student.mother_name|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Mother Name (Arabic)</label>
+                <input type="text" name="mother_name_arabic" value="{{ student.mother_name_arabic|default:'' }}" dir="rtl"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Mother Phone</label>
+                <input type="tel" name="mother_phone" value="{{ student.mother_phone|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+        </div>
+
+        <!-- Academic Information -->
+        <div class="border-t border-b border-gray-200 bg-gradient-to-r from-purple-50 to-pink-50 px-8 py-4">
+            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <i class="fas fa-graduation-cap text-purple-600"></i>
+                Academic Information
+            </h2>
+        </div>
+        
+        <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Grade/Class</label>
+                <input type="text" name="grade_level" value="{{ student.grade_level|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Grade/Class (Arabic)</label>
+                <input type="text" name="grade_level_arabic" value="{{ student.grade_level_arabic|default:'' }}" dir="rtl"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Academic Year</label>
+                <input type="text" name="academic_year" value="{{ student.academic_year|default:'' }}" placeholder="2024-2025"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Admission Date</label>
+                <input type="date" name="admission_date" value="{{ student.admission_date|date:'Y-m-d'|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500">
+            </div>
+        </div>
+
+        <!-- Emergency Contact & Address -->
+        <div class="border-t border-b border-gray-200 bg-gradient-to-r from-orange-50 to-amber-50 px-8 py-4">
+            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <i class="fas fa-ambulance text-orange-600"></i>
+                Emergency Contact & Address
+            </h2>
+        </div>
+        
+        <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Emergency Contact Name</label>
+                <input type="text" name="emergency_contact_name" value="{{ student.emergency_contact_name|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Emergency Contact Phone</label>
+                <input type="tel" name="emergency_contact_phone" value="{{ student.emergency_contact_phone|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Emergency Contact Relation</label>
+                <input type="text" name="emergency_contact_relation" value="{{ student.emergency_contact_relation|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">City</label>
+                <input type="text" name="city" value="{{ student.city|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">District</label>
+                <input type="text" name="district" value="{{ student.district|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">
+            </div>
+            
+            <div class="md:col-span-2">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Address</label>
+                <textarea name="address" rows="2" 
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500">{{ student.address|default:'' }}</textarea>
+            </div>
+        </div>
+
+        <!-- Status & Notes -->
+        <div class="border-t border-b border-gray-200 bg-gradient-to-r from-gray-50 to-slate-50 px-8 py-4">
+            <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                <i class="fas fa-info-circle text-gray-600"></i>
+                Status & Notes
+            </h2>
+        </div>
+        
+        <div class="p-8 space-y-6">
+            <div class="flex items-center gap-3">
+                <input type="checkbox" name="is_active" id="is_active" {% if student.is_active or not student %}checked{% endif %}
+                       class="w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500">
+                <label for="is_active" class="text-sm font-semibold text-gray-700">Active Student</label>
+            </div>
+            
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">Internal Notes</label>
+                <textarea name="notes" rows="3" 
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-500"
+                          placeholder="Any additional notes or comments...">{{ student.notes|default:'' }}</textarea>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="border-t border-gray-200 bg-gray-50 px-8 py-6 flex gap-4 justify-end">
+            <a href="{% if student %}{% url 'students:student_detail' student.pk %}{% else %}{% url 'students:student_list' %}{% endif %}" 
+               class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium">
+                <i class="fas fa-times mr-2"></i>Cancel
+            </a>
+            <button type="submit" 
+                    class="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 transition font-medium shadow-lg">
+                <i class="fas fa-save mr-2"></i>{% if student %}Update Student{% else %}Create Student{% endif %}
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
